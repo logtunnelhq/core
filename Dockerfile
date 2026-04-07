@@ -4,10 +4,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /repo
 
-# Pin the SDK version via global.json so 'dotnet restore' picks the same
-# version we use locally and in CI.
-COPY global.json ./
-
+# global.json is excluded via .dockerignore — see the comment there.
+# The image's bundled .NET 8 SDK is used as-is.
+#
 # Copy project manifests first so 'dotnet restore' is cached on its own
 # Docker layer and only re-runs when a csproj changes.
 COPY src/Layered.Core/Layered.Core.csproj src/Layered.Core/

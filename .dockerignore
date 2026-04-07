@@ -39,6 +39,12 @@ docker-compose.*.yml
 **/appsettings.Local.json
 **/secrets.json
 
+# global.json pins the SDK to 8.0.416 for local dev. The official
+# mcr.microsoft.com/dotnet/sdk:8.0 image ships a slightly older patch
+# and rollForward will not roll backwards, so let the image's SDK
+# resolve naturally instead of forcing a version it does not have.
+global.json
+
 # OS noise
 **/.DS_Store
 **/Thumbs.db
