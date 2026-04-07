@@ -14,4 +14,11 @@
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.74.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\docs\prompts\*.md" Link="prompts\%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Pack>false</Pack>
+    </None>
+  </ItemGroup>
+
 </Project>
