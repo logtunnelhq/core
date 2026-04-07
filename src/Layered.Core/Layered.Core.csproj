@@ -7,11 +7,20 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!-- CS1591: missing XML doc on internal/private members.
+         SKEXP0001/0010/0070: Semantic Kernel marks the Ollama connector
+         and a handful of chat-completion APIs as experimental. We accept
+         that surface area knowingly.
+         CS9057: OllamaSharp source generator was built against a newer
+         Roslyn than .NET 8 ships; harmless and out of our control. -->
+    <NoWarn>$(NoWarn);CS1591;SKEXP0001;SKEXP0010;SKEXP0070;CS9057</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Anthropic" Version="12.11.0" />
     <PackageReference Include="Microsoft.SemanticKernel" Version="1.74.0" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.74.0-alpha" />
+    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.74.0" />
   </ItemGroup>
 
   <ItemGroup>

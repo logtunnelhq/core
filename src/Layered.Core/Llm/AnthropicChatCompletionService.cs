@@ -19,18 +19,19 @@ using System.Text;
 using Anthropic;
 using Anthropic.Core;
 using Anthropic.Models.Messages;
+using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Services;
 
-namespace Layered.Api.Llm;
+namespace Layered.Core.Llm;
 
 /// <summary>
 /// Adapts the official Anthropic .NET SDK
 /// (<c>Anthropic.AnthropicClient</c>) to Semantic Kernel's
 /// <see cref="IChatCompletionService"/> contract so the existing
 /// <c>ChangelogTranslatorService</c> can drive Claude through the
-/// kernel without any provider-specific code in Layered.Core.
+/// kernel without any provider-specific code in the translator.
 /// </summary>
 /// <remarks>
 /// Phase 1 only needs the synchronous request/response path used by

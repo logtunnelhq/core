@@ -14,11 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-using Layered.Api.Configuration;
+using Layered.Core.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 
-namespace Layered.Api.Llm;
+namespace Layered.Core.Llm;
 
 /// <summary>
 /// Composition-root helper that registers a single
@@ -31,7 +33,9 @@ namespace Layered.Api.Llm;
 /// This is a non-static class so it honours the project rule that
 /// behavioural code should not live in static classes, but it is
 /// instantiated directly at the composition root rather than resolved
-/// from DI: it is glue, not a service.
+/// from DI: it is glue, not a service. The same registrar is used by
+/// Layered.Api and Layered.Cli so both hosts pick up identical
+/// behaviour from a shared <c>Llm</c> configuration section.
 /// </remarks>
 public sealed class LlmConnectorRegistrar
 {

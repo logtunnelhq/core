@@ -14,10 +14,10 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-namespace Layered.Api.Configuration;
+namespace Layered.Core.Configuration;
 
 /// <summary>
-/// Identifies which LLM backend the API will route translations through.
+/// Identifies which LLM backend the translator will route through.
 /// New values added here must also be handled by the connector registrar
 /// or startup will fail fast with a clear error.
 /// </summary>

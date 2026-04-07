@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-namespace Layered.Api.Configuration;
+namespace Layered.Core.Configuration;
 
 /// <summary>
 /// Bound configuration for the LLM connector. Populated from the
@@ -26,7 +26,9 @@ namespace Layered.Api.Configuration;
 /// <remarks>
 /// The provider name is bound as a string (not an enum) so the connector
 /// registrar can produce a friendly error listing every supported value
-/// when an unknown provider is configured.
+/// when an unknown provider is configured. Both Layered.Api and
+/// Layered.Cli read from the same section so identical environment
+/// variables work in either host.
 /// </remarks>
 public sealed class LlmOptions
 {

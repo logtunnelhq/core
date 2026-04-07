@@ -6,10 +6,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Layered.Api</RootNamespace>
-    <!-- Semantic Kernel marks the Ollama connector and a handful of
-         chat-completion APIs as experimental. We accept that surface
-         area knowingly. -->
-    <NoWarn>$(NoWarn);SKEXP0001;SKEXP0010;SKEXP0070</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,11 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Anthropic" Version="12.11.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.74.0-alpha" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="1.74.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
   </ItemGroup>
 
