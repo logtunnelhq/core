@@ -18,12 +18,13 @@ using System.Text.Json.Serialization;
 using FluentValidation;
 using Layered.Api.Configuration;
 using Layered.Api.Contracts;
-using Layered.Api.Services;
 using Layered.Api.Validation;
 using Layered.Core.Configuration;
+using Layered.Core.Domain;
 using Layered.Core.Domain.Interfaces;
 using Layered.Core.Llm;
 using Layered.Core.Services;
+using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Serilog;
 
@@ -71,7 +72,7 @@ builder.Services.AddScoped<IChangelogTranslator, ChangelogTranslatorService>();
 
 // ---------- Api services ----------
 
-builder.Services.AddSingleton<LayeredConfigFileWriter>();
+builder.Services.AddSingleton<LayeredProjectConfigStore>();
 
 // FluentValidation auto-discovery — registers every AbstractValidator<T>
 // in the Api assembly as scoped, including the nested validators that the
@@ -136,7 +137,8 @@ app.MapPost("/translate", async (
 app.MapPost("/configure", async (
     ConfigureRequest request,
     IValidator<ConfigureRequest> validator,
-    LayeredConfigFileWriter configFileWriter,
+    LayeredProjectConfigStore configStore,
+    IOptions<LayeredConfigOptions> configOptions,
     CancellationToken cancellationToken) =>
 {
     var validation = await validator.ValidateAsync(request, cancellationToken).ConfigureAwait(false);
@@ -147,9 +149,13 @@ app.MapPost("/configure", async (
             statusCode: StatusCodes.Status400BadRequest);
     }
 
+    var projectConfig = new LayeredProjectConfig(
+        Context: request.CompanyContext.ToDomain(),
+        Audiences: request.AudienceConfigs.Select(a => a.ToDomain()).ToList());
+
     var configId = Guid.NewGuid();
-    var path = await configFileWriter
-        .WriteAsync(LayeredConfigFile.FromRequest(request), cancellationToken)
+    var path = await configStore
+        .WriteAsync(configOptions.Value.OutputDirectory, projectConfig, cancellationToken)
         .ConfigureAwait(false);
 
     return Results.Ok(new ConfigureResponse(ConfigId: configId, Path: path));

@@ -14,22 +14,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-namespace Layered.Api.Contracts;
+using Layered.Core.Domain;
+
+namespace Layered.Core.Configuration;
 
 /// <summary>
 /// On-disk shape of <c>.layered.json</c>. The CLI reads this file when
-/// running translations against a local repository, so the field names
-/// here are part of a public contract — do not rename without updating
-/// the CLI in lock-step.
+/// running translations against a local repository, and the API writes
+/// it from <c>POST /configure</c>; the field names are part of a public
+/// contract — do not rename without updating both hosts in lock-step.
 /// </summary>
 /// <param name="Context">Persisted company context.</param>
 /// <param name="Audiences">Persisted audience configurations.</param>
-public sealed record LayeredConfigFile(
-    CompanyContextDto Context,
-    IReadOnlyList<AudienceConfigDto> Audiences)
-{
-    /// <summary>Build a <see cref="LayeredConfigFile"/> from a <see cref="ConfigureRequest"/>.</summary>
-    public static LayeredConfigFile FromRequest(ConfigureRequest request) => new(
-        Context: request.CompanyContext,
-        Audiences: request.AudienceConfigs);
-}
+public sealed record LayeredProjectConfig(
+    CompanyContext Context,
+    IReadOnlyList<AudienceConfig> Audiences);
