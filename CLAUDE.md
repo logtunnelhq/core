@@ -156,8 +156,19 @@ Each audience gets a distinct system prompt. Prompt files live in /docs/prompts/
 
 ## Environment Variables Expected
 
+The LLM connector is swappable at runtime via the `Llm` configuration
+section. Set `LLM__PROVIDER` to one of `Anthropic`, `OpenAI`, or
+`Ollama`; `LLM__APIKEY` is required for Anthropic and OpenAI but
+ignored for Ollama. `LLM__BASEURL` is optional — supply it for
+OpenAI-compatible endpoints (Azure OpenAI, vLLM, OpenRouter, etc.) or
+to point at a non-default Ollama instance. Unknown providers fail
+startup with a clear error.
+
 ```
-ANTHROPIC__APIKEY=
+LLM__PROVIDER=Anthropic           # or OpenAI, Ollama
+LLM__MODEL=claude-sonnet-4-20250514
+LLM__APIKEY=
+LLM__BASEURL=                     # optional override
 CONNECTIONSTRINGS__POSTGRES=
 CONNECTIONSTRINGS__REDIS=
 STRIPE__SECRETKEY=
