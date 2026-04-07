@@ -41,6 +41,7 @@ hostBuilder.Logging.AddFilter("Layered.Core", LogLevel.None);
 
 hostBuilder.Services.AddSingleton<LayeredProjectConfigStore>();
 hostBuilder.Services.AddSingleton<TranslateCommand>();
+hostBuilder.Services.AddSingleton<ConfigureCommand>();
 
 using var host = hostBuilder.Build();
 
@@ -48,5 +49,6 @@ var rootCommand = new RootCommand(
     "Layered — translate raw Git commits into audience-specific changelogs.");
 
 rootCommand.Add(host.Services.GetRequiredService<TranslateCommand>().Build());
+rootCommand.Add(host.Services.GetRequiredService<ConfigureCommand>().Build());
 
 return await rootCommand.Parse(args).InvokeAsync().ConfigureAwait(false);
