@@ -19,4 +19,10 @@
     <PackageReference Include="System.CommandLine" Version="2.0.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\docs\prompts\*.md" Link="prompts\%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

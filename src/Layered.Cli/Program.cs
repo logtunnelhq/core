@@ -15,6 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 using System.CommandLine;
+using Layered.Cli.Commands;
 using Layered.Core.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,12 +32,21 @@ var hostBuilder = Host.CreateApplicationBuilder(
 hostBuilder.Logging.ClearProviders();
 hostBuilder.Logging.AddSimpleConsole(options => options.SingleLine = true);
 hostBuilder.Logging.SetMinimumLevel(LogLevel.Warning);
+// The translator and Semantic Kernel both log full stack traces on
+// failure; the CLI already prints a clean, single-line error message
+// for the user, so silence those framework loggers to keep stderr
+// readable.
+hostBuilder.Logging.AddFilter("Microsoft.SemanticKernel", LogLevel.None);
+hostBuilder.Logging.AddFilter("Layered.Core", LogLevel.None);
 
 hostBuilder.Services.AddSingleton<LayeredProjectConfigStore>();
+hostBuilder.Services.AddSingleton<TranslateCommand>();
 
 using var host = hostBuilder.Build();
 
 var rootCommand = new RootCommand(
     "Layered — translate raw Git commits into audience-specific changelogs.");
+
+rootCommand.Add(host.Services.GetRequiredService<TranslateCommand>().Build());
 
 return await rootCommand.Parse(args).InvokeAsync().ConfigureAwait(false);
