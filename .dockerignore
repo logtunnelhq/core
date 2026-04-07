@@ -1,0 +1,56 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/out/
+**/[Dd]ebug/
+**/[Rr]elease/
+**/artifacts/
+
+# IDE / editor metadata
+**/.vs/
+**/.vscode/
+**/.idea/
+**/*.user
+**/*.suo
+**/*.userosscache
+
+# Test results and coverage
+**/[Tt]est[Rr]esult*/
+**/coverage*.json
+**/coverage*.xml
+**/coverage*.info
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Docker — these don't need to be in the image build context
+.dockerignore
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+
+# Local secrets and overrides
+.env
+.env.*
+!.env.example
+**/appsettings.Local.json
+**/secrets.json
+
+# OS noise
+**/.DS_Store
+**/Thumbs.db
+
+# Local agent metadata
+.claude/
+
+# Logs
+*.log
+**/[Ll]og/
+**/[Ll]ogs/
+
+# We don't need the CLI or test projects in the runtime image
+src/Layered.Cli/
+tests/

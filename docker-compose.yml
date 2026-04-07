@@ -1,0 +1,28 @@
+services:
+  layered-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: layered-api:latest
+    container_name: layered-api
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+
+      # Pick any provider — Anthropic, OpenAI, or Ollama.
+      # See README.md for the full provider table.
+      LLM__PROVIDER: Anthropic
+      LLM__MODEL: claude-sonnet-4-20250514
+      LLM__APIKEY: ""    # set me before booting
+      LLM__BASEURL: ""   # optional — leave blank for the provider default
+
+      # Where POST /configure writes .layered.json inside the container.
+      # Mount a host volume below if you want it to survive restarts.
+      Layered__Config__OutputDirectory: /var/layered
+
+    # Uncomment to persist .layered.json across container restarts:
+    # volumes:
+    #   - ./.layered-data:/var/layered
+
+    restart: unless-stopped
