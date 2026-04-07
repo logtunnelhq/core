@@ -42,13 +42,12 @@ public sealed class Result<T>
     public bool IsFailure => !IsSuccess;
 
     /// <summary>
-    /// The success value. Throws <see cref="InvalidOperationException"/> if
-    /// the result is a failure — callers must check <see cref="IsSuccess"/>
-    /// first.
+    /// The success value, or <c>default(<typeparamref name="T"/>)</c> when
+    /// the result is a failure. Callers should check
+    /// <see cref="IsSuccess"/> before consuming this value to disambiguate
+    /// "succeeded with default" from "failed".
     /// </summary>
-    public T Value => IsSuccess
-        ? _value
-        : throw new InvalidOperationException("Cannot read Value from a failed Result. Check IsSuccess first.");
+    public T Value => _value;
 
     /// <summary>
     /// The error message. Throws <see cref="InvalidOperationException"/> if
