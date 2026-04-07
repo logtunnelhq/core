@@ -68,7 +68,7 @@ builder.Services.AddSingleton<IPromptTemplateProvider>(serviceProvider =>
     new FileSystemPromptTemplateProvider(
         serviceProvider.GetRequiredService<ILogger<FileSystemPromptTemplateProvider>>()));
 
-builder.Services.AddScoped<IChangelogTranslator, ChangelogTranslatorService>();
+builder.Services.AddSingleton<IChangelogTranslator, ChangelogTranslatorService>();
 
 // ---------- Api services ----------
 

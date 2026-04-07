@@ -242,7 +242,7 @@ public sealed class TranslateCommand
             new FileSystemPromptTemplateProvider(
                 serviceProvider.GetRequiredService<ILogger<FileSystemPromptTemplateProvider>>()));
 
-        services.AddTransient<IChangelogTranslator, ChangelogTranslatorService>();
+        services.AddSingleton<IChangelogTranslator, ChangelogTranslatorService>();
 
         return services.BuildServiceProvider();
     }
