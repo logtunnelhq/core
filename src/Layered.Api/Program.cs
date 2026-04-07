@@ -15,18 +15,15 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 using System.Text.Json.Serialization;
-using Anthropic.SDK;
 using FluentValidation;
 using Layered.Api.Configuration;
 using Layered.Api.Contracts;
+using Layered.Api.Llm;
 using Layered.Api.Services;
 using Layered.Api.Validation;
 using Layered.Core.Domain.Interfaces;
 using Layered.Core.Services;
-using Microsoft.Extensions.AI;
-using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,47 +37,27 @@ builder.Host.UseSerilog((context, _, loggerConfiguration) => loggerConfiguration
 // ---------- Options ----------
 
 builder.Services
-    .AddOptions<AnthropicOptions>()
-    .Bind(builder.Configuration.GetSection(AnthropicOptions.SectionName))
-    .Validate(
-        options => !string.IsNullOrWhiteSpace(options.ApiKey),
-        "Anthropic API key is required. Set the ANTHROPIC__APIKEY environment variable.")
-    .Validate(
-        options => !string.IsNullOrWhiteSpace(options.Model),
-        "Anthropic model identifier is required.")
+    .AddOptions<LlmOptions>()
+    .Bind(builder.Configuration.GetSection(LlmOptions.SectionName))
     .ValidateOnStart();
 
 builder.Services
     .AddOptions<LayeredConfigOptions>()
     .Bind(builder.Configuration.GetSection(LayeredConfigOptions.SectionName));
 
-// ---------- Semantic Kernel + Anthropic connector ----------
+// ---------- Semantic Kernel + LLM connector ----------
 //
 // Per the architecture rules, Semantic Kernel is used in exactly one place
-// (ChangelogTranslatorService). Here we wire an Anthropic-backed
-// IChatClient into the kernel via Microsoft.Extensions.AI's chat client
-// pipeline, which the kernel then exposes as an IChatCompletionService.
+// (ChangelogTranslatorService). The LlmConnectorRegistrar selects the
+// IChatCompletionService at startup based on Llm:Provider, so self-hosters
+// can swap between Anthropic, OpenAI, and Ollama by editing configuration
+// alone — no recompile required.
 
-builder.Services.AddSingleton<AnthropicClient>(serviceProvider =>
-{
-    var options = serviceProvider.GetRequiredService<IOptions<AnthropicOptions>>().Value;
-    return new AnthropicClient(options.ApiKey);
-});
+var llmOptions = builder.Configuration
+    .GetSection(LlmOptions.SectionName)
+    .Get<LlmOptions>() ?? new LlmOptions();
 
-builder.Services.AddSingleton<IChatClient>(serviceProvider =>
-{
-    var options = serviceProvider.GetRequiredService<IOptions<AnthropicOptions>>().Value;
-    var anthropicClient = serviceProvider.GetRequiredService<AnthropicClient>();
-    IChatClient inner = anthropicClient.Messages;
-    return inner
-        .AsBuilder()
-        .ConfigureOptions(chatOptions => chatOptions.ModelId = options.Model)
-        .Build(serviceProvider);
-});
-
-builder.Services.AddSingleton<IChatCompletionService>(serviceProvider =>
-    serviceProvider.GetRequiredService<IChatClient>().AsChatCompletionService(serviceProvider));
-
+new LlmConnectorRegistrar().Register(builder.Services, llmOptions);
 builder.Services.AddKernel();
 
 // ---------- Layered.Core services ----------

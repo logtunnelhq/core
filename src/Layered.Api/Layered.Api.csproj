@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <PackageReference Include="Anthropic" Version="12.11.0" />
-    <PackageReference Include="Anthropic.SDK" Version="5.10.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Ollama" Version="1.74.0-alpha" />
