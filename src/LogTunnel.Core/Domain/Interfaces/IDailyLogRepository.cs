@@ -81,4 +81,22 @@ public interface IDailyLogRepository
         Guid tenantId,
         DateOnly logDate,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Bulk-fetch daily logs for many users on a single day. Used by
+    /// the team-stand-up view to fetch every member's log in one
+    /// query rather than N+1.
+    /// </summary>
+    Task<Result<IReadOnlyList<DailyLog>>> ListByUsersAndDateAsync(
+        Guid tenantId,
+        IReadOnlyCollection<Guid> userIds,
+        DateOnly logDate,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>List every daily log in a tenant within an inclusive date range.</summary>
+    Task<Result<IReadOnlyList<DailyLog>>> ListByTenantInRangeAsync(
+        Guid tenantId,
+        DateOnly from,
+        DateOnly to,
+        CancellationToken cancellationToken = default);
 }

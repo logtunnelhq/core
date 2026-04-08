@@ -123,6 +123,66 @@ internal sealed class CommitRepository : ICommitRepository
         return Result<IReadOnlyList<Commit>>.Success(commits);
     }
 
+    public async Task<Result<IReadOnlyList<Commit>>> ListByAuthorsAsync(
+        Guid tenantId,
+        IReadOnlyCollection<Guid> authorUserIds,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken cancellationToken = default)
+    {
+        if (authorUserIds.Count == 0)
+            return Result<IReadOnlyList<Commit>>.Success(Array.Empty<Commit>());
+
+        var commits = await _db.Commits
+            .Where(c => c.TenantId == tenantId
+                     && c.AuthorUserId != null
+                     && authorUserIds.Contains(c.AuthorUserId.Value)
+                     && c.AuthoredAt >= from
+                     && c.AuthoredAt <= to)
+            .OrderByDescending(c => c.AuthoredAt)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<Commit>>.Success(commits);
+    }
+
+    public async Task<Result<IReadOnlyList<Commit>>> ListByProjectAsync(
+        Guid projectId,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken cancellationToken = default)
+    {
+        // Method-syntax form — query syntax would shadow the 'from'
+        // parameter against the LINQ 'from' contextual keyword.
+        var commits = await _db.Commits
+            .Join(
+                _db.CommitProjects,
+                c => c.Id,
+                cp => cp.CommitId,
+                (c, cp) => new { Commit = c, cp.ProjectId })
+            .Where(x => x.ProjectId == projectId
+                     && x.Commit.AuthoredAt >= from
+                     && x.Commit.AuthoredAt <= to)
+            .OrderByDescending(x => x.Commit.AuthoredAt)
+            .Select(x => x.Commit)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<Commit>>.Success(commits);
+    }
+
+    public async Task<Result<IReadOnlyList<Commit>>> ListByTenantAsync(
+        Guid tenantId,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken cancellationToken = default)
+    {
+        var commits = await _db.Commits
+            .Where(c => c.TenantId == tenantId && c.AuthoredAt >= from && c.AuthoredAt <= to)
+            .OrderByDescending(c => c.AuthoredAt)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<Commit>>.Success(commits);
+    }
+
     private static string NormalisePathFilter(string pathFilter)
     {
         // '/frontend/**' -> '/frontend/'

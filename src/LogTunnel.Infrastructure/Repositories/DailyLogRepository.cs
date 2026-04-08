@@ -165,4 +165,34 @@ internal sealed class DailyLogRepository : IDailyLogRepository
             .ConfigureAwait(false);
         return Result<IReadOnlyList<DailyLog>>.Success(logs);
     }
+
+    public async Task<Result<IReadOnlyList<DailyLog>>> ListByUsersAndDateAsync(
+        Guid tenantId,
+        IReadOnlyCollection<Guid> userIds,
+        DateOnly logDate,
+        CancellationToken cancellationToken = default)
+    {
+        if (userIds.Count == 0)
+            return Result<IReadOnlyList<DailyLog>>.Success(Array.Empty<DailyLog>());
+
+        var logs = await _db.DailyLogs
+            .Where(d => d.TenantId == tenantId && d.LogDate == logDate && userIds.Contains(d.UserId))
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<DailyLog>>.Success(logs);
+    }
+
+    public async Task<Result<IReadOnlyList<DailyLog>>> ListByTenantInRangeAsync(
+        Guid tenantId,
+        DateOnly from,
+        DateOnly to,
+        CancellationToken cancellationToken = default)
+    {
+        var logs = await _db.DailyLogs
+            .Where(d => d.TenantId == tenantId && d.LogDate >= from && d.LogDate <= to)
+            .OrderByDescending(d => d.LogDate)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<DailyLog>>.Success(logs);
+    }
 }

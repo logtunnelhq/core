@@ -54,4 +54,26 @@ public interface ICommitRepository
         DateTimeOffset from,
         DateTimeOffset to,
         CancellationToken cancellationToken = default);
+
+    /// <summary>List commits by many authors in a UTC range — used by the team-stand-up view.</summary>
+    Task<Result<IReadOnlyList<Commit>>> ListByAuthorsAsync(
+        Guid tenantId,
+        IReadOnlyCollection<Guid> authorUserIds,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>List every commit mapped to a project (via <see cref="CommitProject"/>) in a UTC range.</summary>
+    Task<Result<IReadOnlyList<Commit>>> ListByProjectAsync(
+        Guid projectId,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>List every commit in a tenant in a UTC range — used by the org-rollup view.</summary>
+    Task<Result<IReadOnlyList<Commit>>> ListByTenantAsync(
+        Guid tenantId,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken cancellationToken = default);
 }
