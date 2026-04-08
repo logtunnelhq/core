@@ -29,7 +29,9 @@ internal sealed class CodeRepositoryConfiguration : IEntityTypeConfiguration<Cod
         // matches Schema/001_initial.sql verbatim.
         builder.ToTable("repositories", t =>
         {
-            t.HasCheckConstraint("ck_repositories_host", "host IN ('github')");
+            t.HasCheckConstraint(
+                "ck_repositories_host",
+                "host IN ('github', 'gitlab', 'azure_devops')");
         });
 
         builder.HasKey(x => x.Id);

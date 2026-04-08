@@ -30,6 +30,16 @@ public interface ICodeRepositoryRepository
     /// <summary>Fetch a code repository by tenant and primary key.</summary>
     Task<Result<CodeRepository>> GetByIdAsync(Guid tenantId, Guid id, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Fetch a code repository by primary key without a tenant scope.
+    /// Used by the webhook receivers, which know the repository id
+    /// from the URL but do not yet have a JWT to derive the tenant
+    /// from. Returns the row's tenant on success so the caller can
+    /// stamp it onto the inserted commit / delivery rows.
+    /// </summary>
+    Task<Result<CodeRepository>> GetByIdAcrossTenantsAsync(
+        Guid id, CancellationToken cancellationToken = default);
+
     /// <summary>List every code repository in the tenant, ordered by remote URL.</summary>
     Task<Result<IReadOnlyList<CodeRepository>>> ListByTenantAsync(
         Guid tenantId, CancellationToken cancellationToken = default);

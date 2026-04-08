@@ -37,6 +37,17 @@ internal sealed class CodeRepositoryRepository : ICodeRepositoryRepository
             : Result<CodeRepository>.Success(repository);
     }
 
+    public async Task<Result<CodeRepository>> GetByIdAcrossTenantsAsync(
+        Guid id, CancellationToken cancellationToken = default)
+    {
+        var repository = await _db.Repositories
+            .FirstOrDefaultAsync(r => r.Id == id, cancellationToken)
+            .ConfigureAwait(false);
+        return repository is null
+            ? Result<CodeRepository>.Failure($"Repository {id} not found.")
+            : Result<CodeRepository>.Success(repository);
+    }
+
     public async Task<Result<IReadOnlyList<CodeRepository>>> ListByTenantAsync(
         Guid tenantId, CancellationToken cancellationToken = default)
     {

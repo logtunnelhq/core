@@ -29,7 +29,7 @@ public sealed class CodeRepository
     public Guid Id { get; set; }
     public Guid TenantId { get; set; }
 
-    /// <summary>Git host. Currently only <c>"github"</c>.</summary>
+    /// <summary>Git host: <c>"github"</c>, <c>"gitlab"</c>, or <c>"azure_devops"</c>.</summary>
     public string Host { get; set; } = "github";
 
     /// <summary>Canonical https url, e.g. <c>"https://github.com/acme/web"</c>.</summary>
