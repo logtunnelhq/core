@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogTunnel.Core.Tests", "tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogTunnel.Infrastructure", "src\LogTunnel.Infrastructure\LogTunnel.Infrastructure.csproj", "{DAF8E467-DA65-4F9D-8B92-004CD942246E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogTunnel.Infrastructure.Tests", "tests\LogTunnel.Infrastructure.Tests\LogTunnel.Infrastructure.Tests.csproj", "{A0A7A005-D8BC-4B80-A1AF-F3C3389E9A0B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +48,10 @@ Global
 		{DAF8E467-DA65-4F9D-8B92-004CD942246E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAF8E467-DA65-4F9D-8B92-004CD942246E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAF8E467-DA65-4F9D-8B92-004CD942246E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0A7A005-D8BC-4B80-A1AF-F3C3389E9A0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0A7A005-D8BC-4B80-A1AF-F3C3389E9A0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0A7A005-D8BC-4B80-A1AF-F3C3389E9A0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0A7A005-D8BC-4B80-A1AF-F3C3389E9A0B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4AA198B1-5F4D-4063-8A74-041918609EBD} = {883DBD82-F138-4407-A027-EC5FD464D2EE}
@@ -53,5 +59,6 @@ Global
 		{EE2D37C5-3468-47EF-A174-F054C2B65576} = {883DBD82-F138-4407-A027-EC5FD464D2EE}
 		{3AB3CF1D-8C76-49E7-AA20-63D271ED1B51} = {A47E1210-9905-4379-8ADE-D9660D337F3F}
 		{DAF8E467-DA65-4F9D-8B92-004CD942246E} = {883DBD82-F138-4407-A027-EC5FD464D2EE}
+		{A0A7A005-D8BC-4B80-A1AF-F3C3389E9A0B} = {A47E1210-9905-4379-8ADE-D9660D337F3F}
 	EndGlobalSection
 EndGlobal
