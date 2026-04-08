@@ -14,12 +14,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-namespace LogTunnel.Infrastructure;
+namespace LogTunnel.Infrastructure.Entities;
 
 /// <summary>
-/// Empty marker type that anchors the <see cref="LogTunnel.Infrastructure"/>
-/// namespace and gives the assembly at least one type. Replaced by real
-/// entity classes in step 3 of the Phase 2 build order; kept here so the
-/// project compiles cleanly between scaffolding and the entity work.
+/// EF Core entity for the <c>team_members</c> join table. Composite
+/// primary key <c>(TeamId, UserId)</c> is configured in step 4.
+/// <see cref="Role"/> = <c>"lead"</c> is what makes a user a team lead
+/// for that specific team — independent of <see cref="User.DashboardRole"/>.
 /// </summary>
-internal static class AssemblyMarker;
+public sealed class TeamMember
+{
+    public Guid TeamId { get; set; }
+    public Guid UserId { get; set; }
+
+    /// <summary><c>"member"</c> or <c>"lead"</c>.</summary>
+    public string Role { get; set; } = "member";
+
+    public DateTimeOffset JoinedAt { get; set; }
+}
