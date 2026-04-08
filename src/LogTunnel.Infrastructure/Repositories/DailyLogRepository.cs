@@ -195,4 +195,36 @@ internal sealed class DailyLogRepository : IDailyLogRepository
             .ConfigureAwait(false);
         return Result<IReadOnlyList<DailyLog>>.Success(logs);
     }
+
+    public async Task<Result<int>> FreezeLogsBeforeDateAsync(
+        Guid tenantId,
+        DateOnly cutoffDate,
+        DateTimeOffset frozenAt,
+        CancellationToken cancellationToken = default)
+    {
+        var rows = await _db.DailyLogs
+            .Where(d => d.TenantId == tenantId
+                     && d.LogDate < cutoffDate
+                     && d.FrozenAt == null)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        if (rows.Count == 0) return Result<int>.Success(0);
+
+        foreach (var row in rows)
+        {
+            row.FrozenAt = frozenAt;
+            row.UpdatedAt = frozenAt;
+        }
+
+        try
+        {
+            await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return Result<int>.Success(rows.Count);
+        }
+        catch (DbUpdateException ex)
+        {
+            return Result<int>.Failure($"Failed to freeze daily logs: {ex.GetBaseException().Message}");
+        }
+    }
 }

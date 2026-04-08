@@ -99,4 +99,18 @@ public interface IDailyLogRepository
         DateOnly from,
         DateOnly to,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Bulk-flip every daily log in a tenant whose
+    /// <see cref="DailyLog.LogDate"/> is strictly less than
+    /// <paramref name="cutoffDate"/> and whose
+    /// <see cref="DailyLog.FrozenAt"/> is still null. Returns the
+    /// number of rows that were frozen. Used by the daily-log freeze
+    /// background service at the start of each tenant-local day.
+    /// </summary>
+    Task<Result<int>> FreezeLogsBeforeDateAsync(
+        Guid tenantId,
+        DateOnly cutoffDate,
+        DateTimeOffset frozenAt,
+        CancellationToken cancellationToken = default);
 }

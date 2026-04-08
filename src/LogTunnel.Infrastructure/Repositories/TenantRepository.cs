@@ -46,6 +46,16 @@ internal sealed class TenantRepository : ITenantRepository
             : Result<Tenant>.Success(tenant);
     }
 
+    public async Task<Result<IReadOnlyList<Tenant>>> ListActiveAsync(CancellationToken cancellationToken = default)
+    {
+        var rows = await _db.Tenants
+            .Where(t => t.Status == "active")
+            .OrderBy(t => t.Slug)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<Tenant>>.Success(rows);
+    }
+
     public async Task<Result<Tenant>> AddAsync(Tenant tenant, CancellationToken cancellationToken = default)
     {
         if (tenant is null) return Result<Tenant>.Failure("Tenant is required.");

@@ -31,6 +31,9 @@ public interface ITenantRepository
     /// <summary>Fetch a tenant by its url-safe slug.</summary>
     Task<Result<Tenant>> GetBySlugAsync(string slug, CancellationToken cancellationToken = default);
 
+    /// <summary>List every active tenant. Used by the daily-log freeze worker to walk timezones.</summary>
+    Task<Result<IReadOnlyList<Tenant>>> ListActiveAsync(CancellationToken cancellationToken = default);
+
     /// <summary>Insert a new tenant. Returns the persisted entity (with server-generated columns populated).</summary>
     Task<Result<Tenant>> AddAsync(Tenant tenant, CancellationToken cancellationToken = default);
 }
