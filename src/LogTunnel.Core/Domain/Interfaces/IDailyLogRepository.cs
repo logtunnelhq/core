@@ -28,11 +28,33 @@ namespace LogTunnel.Core.Domain.Interfaces;
 /// </summary>
 public interface IDailyLogRepository
 {
+    /// <summary>Fetch a daily log by tenant and primary key.</summary>
+    Task<Result<DailyLog>> GetByIdAsync(
+        Guid tenantId,
+        Guid id,
+        CancellationToken cancellationToken = default);
+
     /// <summary>Fetch the daily log for a user on a specific day, if any.</summary>
     Task<Result<DailyLog?>> GetForUserAndDateAsync(
         Guid tenantId,
         Guid userId,
         DateOnly logDate,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// List a user's daily logs in an inclusive date range, ordered
+    /// most recent day first.
+    /// </summary>
+    Task<Result<IReadOnlyList<DailyLog>>> ListByUserAsync(
+        Guid tenantId,
+        Guid userId,
+        DateOnly from,
+        DateOnly to,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>List every revision attached to a daily log, oldest first.</summary>
+    Task<Result<IReadOnlyList<DailyLogRevision>>> ListRevisionsAsync(
+        Guid dailyLogId,
         CancellationToken cancellationToken = default);
 
     /// <summary>Insert a fresh daily log. Fails if one already exists for <c>(tenant, user, date)</c>.</summary>

@@ -42,4 +42,16 @@ public interface ICommitRepository
         DateTimeOffset from,
         DateTimeOffset to,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// List commits authored by a specific user within an inclusive
+    /// UTC range, ordered most-recent first. Used by the daily-log
+    /// "what did I commit yesterday?" view.
+    /// </summary>
+    Task<Result<IReadOnlyList<Commit>>> ListByAuthorAsync(
+        Guid tenantId,
+        Guid authorUserId,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken cancellationToken = default);
 }

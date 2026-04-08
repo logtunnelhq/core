@@ -105,6 +105,24 @@ internal sealed class CommitRepository : ICommitRepository
         return Result<IReadOnlyList<Commit>>.Success(commits);
     }
 
+    public async Task<Result<IReadOnlyList<Commit>>> ListByAuthorAsync(
+        Guid tenantId,
+        Guid authorUserId,
+        DateTimeOffset from,
+        DateTimeOffset to,
+        CancellationToken cancellationToken = default)
+    {
+        var commits = await _db.Commits
+            .Where(c => c.TenantId == tenantId
+                     && c.AuthorUserId == authorUserId
+                     && c.AuthoredAt >= from
+                     && c.AuthoredAt <= to)
+            .OrderByDescending(c => c.AuthoredAt)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<Commit>>.Success(commits);
+    }
+
     private static string NormalisePathFilter(string pathFilter)
     {
         // '/frontend/**' -> '/frontend/'

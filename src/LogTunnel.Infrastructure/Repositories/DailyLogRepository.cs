@@ -27,6 +27,49 @@ internal sealed class DailyLogRepository : IDailyLogRepository
 
     public DailyLogRepository(LogTunnelDbContext db) => _db = db;
 
+    public async Task<Result<DailyLog>> GetByIdAsync(
+        Guid tenantId,
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var log = await _db.DailyLogs
+            .FirstOrDefaultAsync(d => d.TenantId == tenantId && d.Id == id, cancellationToken)
+            .ConfigureAwait(false);
+        return log is null
+            ? Result<DailyLog>.Failure($"DailyLog {id} not found in tenant {tenantId}.")
+            : Result<DailyLog>.Success(log);
+    }
+
+    public async Task<Result<IReadOnlyList<DailyLog>>> ListByUserAsync(
+        Guid tenantId,
+        Guid userId,
+        DateOnly from,
+        DateOnly to,
+        CancellationToken cancellationToken = default)
+    {
+        var rows = await _db.DailyLogs
+            .Where(d => d.TenantId == tenantId
+                     && d.UserId == userId
+                     && d.LogDate >= from
+                     && d.LogDate <= to)
+            .OrderByDescending(d => d.LogDate)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<DailyLog>>.Success(rows);
+    }
+
+    public async Task<Result<IReadOnlyList<DailyLogRevision>>> ListRevisionsAsync(
+        Guid dailyLogId,
+        CancellationToken cancellationToken = default)
+    {
+        var rows = await _db.DailyLogRevisions
+            .Where(r => r.DailyLogId == dailyLogId)
+            .OrderBy(r => r.EditedAt)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<DailyLogRevision>>.Success(rows);
+    }
+
     public async Task<Result<DailyLog?>> GetForUserAndDateAsync(
         Guid tenantId,
         Guid userId,
