@@ -1,6 +1,6 @@
 # LogTunnel
 
-[![build](https://img.shields.io/github/actions/workflow/status/your-org/logtunnel/ci.yml?branch=main&label=build)](https://github.com/your-org/logtunnel/actions)
+[![build](https://img.shields.io/github/actions/workflow/status/logtunnelhq/core/ci.yml?branch=master&label=build)](https://github.com/logtunnelhq/core/actions)
 [![license](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
 [![nuget](https://img.shields.io/nuget/v/LogTunnel?label=nuget)](https://www.nuget.org/packages/LogTunnel)
 
@@ -140,8 +140,8 @@ By default the file lands in the API's current working directory. Override with 
 ## Self-hosting
 
 ```sh
-git clone https://github.com/your-org/logtunnel.git
-cd logtunnel
+git clone https://github.com/logtunnelhq/core.git
+cd core
 
 # Pick any provider
 export LLM__PROVIDER=Anthropic
