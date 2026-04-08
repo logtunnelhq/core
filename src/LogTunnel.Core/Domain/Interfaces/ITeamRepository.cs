@@ -29,6 +29,24 @@ public interface ITeamRepository
     /// <summary>Fetch a team by tenant and primary key.</summary>
     Task<Result<Team>> GetByIdAsync(Guid tenantId, Guid id, CancellationToken cancellationToken = default);
 
+    /// <summary>List every team in the tenant, ordered by name.</summary>
+    Task<Result<IReadOnlyList<Team>>> ListByTenantAsync(Guid tenantId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// List the members of a team — joined against
+    /// <see cref="User"/> rows so callers see display names alongside
+    /// the membership role (<c>"member"</c> or <c>"lead"</c>).
+    /// </summary>
+    Task<Result<IReadOnlyList<TeamMembership>>> ListMembersAsync(
+        Guid teamId, CancellationToken cancellationToken = default);
+
     /// <summary>Insert a new team.</summary>
     Task<Result<Team>> AddAsync(Team team, CancellationToken cancellationToken = default);
 }
+
+/// <summary>
+/// Result row for <see cref="ITeamRepository.ListMembersAsync"/>.
+/// Carries the user identity together with the membership role on
+/// that team.
+/// </summary>
+public sealed record TeamMembership(User User, string Role);

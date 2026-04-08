@@ -29,6 +29,12 @@ public interface IProjectRepository
     /// <summary>Fetch a project by tenant and primary key.</summary>
     Task<Result<Project>> GetByIdAsync(Guid tenantId, Guid id, CancellationToken cancellationToken = default);
 
+    /// <summary>List every project in the tenant, ordered by name.</summary>
+    Task<Result<IReadOnlyList<Project>>> ListByTenantAsync(Guid tenantId, CancellationToken cancellationToken = default);
+
+    /// <summary>List the members of a project, joined against the user table.</summary>
+    Task<Result<IReadOnlyList<User>>> ListMembersAsync(Guid projectId, CancellationToken cancellationToken = default);
+
     /// <summary>Insert a new project.</summary>
     Task<Result<Project>> AddAsync(Project project, CancellationToken cancellationToken = default);
 }

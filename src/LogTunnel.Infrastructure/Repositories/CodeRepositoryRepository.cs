@@ -37,6 +37,27 @@ internal sealed class CodeRepositoryRepository : ICodeRepositoryRepository
             : Result<CodeRepository>.Success(repository);
     }
 
+    public async Task<Result<IReadOnlyList<CodeRepository>>> ListByTenantAsync(
+        Guid tenantId, CancellationToken cancellationToken = default)
+    {
+        var rows = await _db.Repositories
+            .Where(r => r.TenantId == tenantId)
+            .OrderBy(r => r.RemoteUrl)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<CodeRepository>>.Success(rows);
+    }
+
+    public async Task<Result<IReadOnlyList<RepositoryProjectMapping>>> ListProjectMappingsAsync(
+        Guid repositoryId, CancellationToken cancellationToken = default)
+    {
+        var rows = await _db.RepositoryProjectMappings
+            .Where(m => m.RepositoryId == repositoryId)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<RepositoryProjectMapping>>.Success(rows);
+    }
+
     public async Task<Result<CodeRepository>> AddAsync(CodeRepository repository, CancellationToken cancellationToken = default)
     {
         if (repository is null) return Result<CodeRepository>.Failure("Repository is required.");
@@ -76,6 +97,38 @@ internal sealed class CodeRepositoryRepository : ICodeRepositoryRepository
         {
             return Result<RepositoryProjectMapping>.Failure(
                 $"Failed to insert repository project mapping: {ex.GetBaseException().Message}");
+        }
+    }
+
+    public async Task<Result<bool>> RemoveProjectMappingAsync(
+        Guid repositoryId,
+        Guid projectId,
+        string? pathFilter,
+        CancellationToken cancellationToken = default)
+    {
+        // The composite key includes COALESCE(path_filter, '') so the
+        // null and "" cases must collapse together for the comparison.
+        var existing = await _db.RepositoryProjectMappings
+            .FirstOrDefaultAsync(
+                m => m.RepositoryId == repositoryId
+                  && m.ProjectId == projectId
+                  && m.PathFilter == pathFilter,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        if (existing is null)
+            return Result<bool>.Success(true); // idempotent
+
+        try
+        {
+            _db.RepositoryProjectMappings.Remove(existing);
+            await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return Result<bool>.Success(true);
+        }
+        catch (DbUpdateException ex)
+        {
+            return Result<bool>.Failure(
+                $"Failed to remove repository project mapping: {ex.GetBaseException().Message}");
         }
     }
 }

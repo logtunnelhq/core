@@ -79,6 +79,16 @@ internal sealed class UserRepository : IUserRepository
             : Result<User>.Success(user);
     }
 
+    public async Task<Result<IReadOnlyList<User>>> ListByTenantAsync(Guid tenantId, CancellationToken cancellationToken = default)
+    {
+        var rows = await _db.Users
+            .Where(u => u.TenantId == tenantId)
+            .OrderBy(u => u.DisplayName)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<User>>.Success(rows);
+    }
+
     public async Task<Result<User>> AddAsync(User user, CancellationToken cancellationToken = default)
     {
         if (user is null) return Result<User>.Failure("User is required.");
@@ -118,6 +128,25 @@ internal sealed class UserRepository : IUserRepository
         }
     }
 
+    public async Task<Result<bool>> RemoveFromTeamAsync(Guid teamId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var existing = await _db.TeamMembers
+            .FirstOrDefaultAsync(tm => tm.TeamId == teamId && tm.UserId == userId, cancellationToken)
+            .ConfigureAwait(false);
+        if (existing is null) return Result<bool>.Success(true); // idempotent
+
+        try
+        {
+            _db.TeamMembers.Remove(existing);
+            await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return Result<bool>.Success(true);
+        }
+        catch (DbUpdateException ex)
+        {
+            return Result<bool>.Failure($"Failed to remove user from team: {ex.GetBaseException().Message}");
+        }
+    }
+
     public async Task<Result<bool>> AddToProjectAsync(Guid projectId, Guid userId, CancellationToken cancellationToken = default)
     {
         try
@@ -134,6 +163,25 @@ internal sealed class UserRepository : IUserRepository
         catch (DbUpdateException ex)
         {
             return Result<bool>.Failure($"Failed to add user to project: {ex.GetBaseException().Message}");
+        }
+    }
+
+    public async Task<Result<bool>> RemoveFromProjectAsync(Guid projectId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var existing = await _db.ProjectMembers
+            .FirstOrDefaultAsync(pm => pm.ProjectId == projectId && pm.UserId == userId, cancellationToken)
+            .ConfigureAwait(false);
+        if (existing is null) return Result<bool>.Success(true); // idempotent
+
+        try
+        {
+            _db.ProjectMembers.Remove(existing);
+            await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return Result<bool>.Success(true);
+        }
+        catch (DbUpdateException ex)
+        {
+            return Result<bool>.Failure($"Failed to remove user from project: {ex.GetBaseException().Message}");
         }
     }
 }

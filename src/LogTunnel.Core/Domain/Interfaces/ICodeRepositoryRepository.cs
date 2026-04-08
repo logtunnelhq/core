@@ -30,6 +30,14 @@ public interface ICodeRepositoryRepository
     /// <summary>Fetch a code repository by tenant and primary key.</summary>
     Task<Result<CodeRepository>> GetByIdAsync(Guid tenantId, Guid id, CancellationToken cancellationToken = default);
 
+    /// <summary>List every code repository in the tenant, ordered by remote URL.</summary>
+    Task<Result<IReadOnlyList<CodeRepository>>> ListByTenantAsync(
+        Guid tenantId, CancellationToken cancellationToken = default);
+
+    /// <summary>List every project mapping for a repository.</summary>
+    Task<Result<IReadOnlyList<RepositoryProjectMapping>>> ListProjectMappingsAsync(
+        Guid repositoryId, CancellationToken cancellationToken = default);
+
     /// <summary>Insert a new code repository.</summary>
     Task<Result<CodeRepository>> AddAsync(CodeRepository repository, CancellationToken cancellationToken = default);
 
@@ -38,6 +46,19 @@ public interface ICodeRepositoryRepository
     /// filter (<c>"/frontend/**"</c>, etc.) for monorepo support.
     /// </summary>
     Task<Result<RepositoryProjectMapping>> AddProjectMappingAsync(
+        Guid repositoryId,
+        Guid projectId,
+        string? pathFilter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Remove a single project mapping. The composite key is
+    /// <c>(repositoryId, projectId, COALESCE(pathFilter, ''))</c>, so
+    /// removing a glob-filtered mapping requires passing the same
+    /// glob — passing <c>null</c> removes the unfiltered mapping.
+    /// Returns success even if no row matches (idempotent).
+    /// </summary>
+    Task<Result<bool>> RemoveProjectMappingAsync(
         Guid repositoryId,
         Guid projectId,
         string? pathFilter,

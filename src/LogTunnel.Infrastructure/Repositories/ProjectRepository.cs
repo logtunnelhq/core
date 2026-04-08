@@ -37,6 +37,28 @@ internal sealed class ProjectRepository : IProjectRepository
             : Result<Project>.Success(project);
     }
 
+    public async Task<Result<IReadOnlyList<Project>>> ListByTenantAsync(Guid tenantId, CancellationToken cancellationToken = default)
+    {
+        var rows = await _db.Projects
+            .Where(p => p.TenantId == tenantId)
+            .OrderBy(p => p.Name)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<Project>>.Success(rows);
+    }
+
+    public async Task<Result<IReadOnlyList<User>>> ListMembersAsync(Guid projectId, CancellationToken cancellationToken = default)
+    {
+        var rows = await (
+            from pm in _db.ProjectMembers
+            join u in _db.Users on pm.UserId equals u.Id
+            where pm.ProjectId == projectId
+            orderby u.DisplayName
+            select u
+        ).ToListAsync(cancellationToken).ConfigureAwait(false);
+        return Result<IReadOnlyList<User>>.Success(rows);
+    }
+
     public async Task<Result<Project>> AddAsync(Project project, CancellationToken cancellationToken = default)
     {
         if (project is null) return Result<Project>.Failure("Project is required.");
