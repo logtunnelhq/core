@@ -31,7 +31,7 @@ internal sealed class TranslationConfiguration : IEntityTypeConfiguration<Transl
             t.HasCheckConstraint("ck_translations_audience",
                 "audience IN ('TechLead','Manager','CEO','Public')");
             t.HasCheckConstraint("ck_translations_status",
-                "status IN ('pending','ready','failed')");
+                "status IN ('pending','rendering','ready','failed')");
         });
 
         builder.HasKey(x => x.Id);

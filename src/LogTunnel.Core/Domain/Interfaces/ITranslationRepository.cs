@@ -41,4 +41,25 @@ public interface ITranslationRepository
 
     /// <summary>Insert a freshly-rendered translation row.</summary>
     Task<Result<Translation>> AddAsync(Translation translation, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Atomically pick up the oldest <c>status='pending'</c> row across
+    /// all tenants. Used by the translation worker to pull work off
+    /// the queue. Implementations should use a row-level lock or
+    /// equivalent so two worker instances don't double-process the
+    /// same row. Returns <c>null</c> when nothing is pending.
+    /// </summary>
+    Task<Result<Translation?>> LeaseNextPendingAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>Mark a translation as ready and store the rendered content.</summary>
+    Task<Result<Translation>> MarkReadyAsync(
+        Guid translationId,
+        string content,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>Mark a translation as failed with a free-text reason.</summary>
+    Task<Result<Translation>> MarkFailedAsync(
+        Guid translationId,
+        string failureReason,
+        CancellationToken cancellationToken = default);
 }

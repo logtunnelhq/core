@@ -65,4 +65,86 @@ internal sealed class TranslationRepository : ITranslationRepository
             return Result<Translation>.Failure($"Failed to insert translation: {ex.GetBaseException().Message}");
         }
     }
+
+    public async Task<Result<Translation?>> LeaseNextPendingAsync(CancellationToken cancellationToken = default)
+    {
+        // Use a SELECT ... FOR UPDATE SKIP LOCKED transaction so two
+        // workers can run side-by-side without grabbing the same row.
+        // We then flip status to a sentinel that prevents another
+        // worker from picking it up while we render.
+        await using var tx = await _db.Database
+            .BeginTransactionAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        var leased = await _db.Translations
+            .FromSqlRaw(
+                "SELECT * FROM translations WHERE status = 'pending' " +
+                "ORDER BY generated_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED")
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        if (leased is null)
+        {
+            await tx.CommitAsync(cancellationToken).ConfigureAwait(false);
+            return Result<Translation?>.Success(null);
+        }
+
+        // Mark with a transient status so subsequent leases skip it
+        // even after the row lock releases.
+        leased.Status = "rendering";
+        await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await tx.CommitAsync(cancellationToken).ConfigureAwait(false);
+        return Result<Translation?>.Success(leased);
+    }
+
+    public async Task<Result<Translation>> MarkReadyAsync(
+        Guid translationId,
+        string content,
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await _db.Translations
+            .FirstOrDefaultAsync(t => t.Id == translationId, cancellationToken)
+            .ConfigureAwait(false);
+        if (existing is null) return Result<Translation>.Failure($"Translation {translationId} not found.");
+
+        existing.Content = content;
+        existing.Status = "ready";
+        existing.FailureReason = null;
+        existing.GeneratedAt = DateTimeOffset.UtcNow;
+
+        try
+        {
+            await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return Result<Translation>.Success(existing);
+        }
+        catch (DbUpdateException ex)
+        {
+            return Result<Translation>.Failure($"Failed to mark translation ready: {ex.GetBaseException().Message}");
+        }
+    }
+
+    public async Task<Result<Translation>> MarkFailedAsync(
+        Guid translationId,
+        string failureReason,
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await _db.Translations
+            .FirstOrDefaultAsync(t => t.Id == translationId, cancellationToken)
+            .ConfigureAwait(false);
+        if (existing is null) return Result<Translation>.Failure($"Translation {translationId} not found.");
+
+        existing.Status = "failed";
+        existing.FailureReason = failureReason;
+        existing.GeneratedAt = DateTimeOffset.UtcNow;
+
+        try
+        {
+            await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return Result<Translation>.Success(existing);
+        }
+        catch (DbUpdateException ex)
+        {
+            return Result<Translation>.Failure($"Failed to mark translation failed: {ex.GetBaseException().Message}");
+        }
+    }
 }
