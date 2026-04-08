@@ -26,12 +26,39 @@ namespace LogTunnel.Core.Domain.Interfaces;
 /// </summary>
 public interface IPublicTranslationRepository
 {
+    /// <summary>Fetch a public translation by tenant and primary key.</summary>
+    Task<Result<PublicTranslation>> GetByIdAsync(
+        Guid tenantId,
+        Guid id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// List public translations for a tenant, optionally filtered by
+    /// <paramref name="workflowStatus"/>. Pass <c>null</c> to return
+    /// every status.
+    /// </summary>
+    Task<Result<IReadOnlyList<PublicTranslation>>> ListByTenantAsync(
+        Guid tenantId,
+        string? workflowStatus,
+        CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Open a draft public translation on top of an existing
     /// <see cref="Translation"/> whose audience is <c>"Public"</c>. The
     /// new row starts with <c>workflow_status = 'draft'</c>.
     /// </summary>
     Task<Result<PublicTranslation>> AddAsync(PublicTranslation publicTranslation, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Update the marketing-edited content. Only permitted when the
+    /// row is in <c>'draft'</c> — once approved or published the
+    /// content is frozen.
+    /// </summary>
+    Task<Result<PublicTranslation>> UpdateContentAsync(
+        Guid publicTranslationId,
+        string editedContent,
+        Guid actorId,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Move a public translation through the workflow:

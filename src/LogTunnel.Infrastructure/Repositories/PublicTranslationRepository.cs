@@ -27,6 +27,71 @@ internal sealed class PublicTranslationRepository : IPublicTranslationRepository
 
     public PublicTranslationRepository(LogTunnelDbContext db) => _db = db;
 
+    public async Task<Result<PublicTranslation>> GetByIdAsync(
+        Guid tenantId, Guid id, CancellationToken cancellationToken = default)
+    {
+        var row = await _db.PublicTranslations
+            .FirstOrDefaultAsync(p => p.TenantId == tenantId && p.Id == id, cancellationToken)
+            .ConfigureAwait(false);
+        return row is null
+            ? Result<PublicTranslation>.Failure($"PublicTranslation {id} not found in tenant {tenantId}.")
+            : Result<PublicTranslation>.Success(row);
+    }
+
+    public async Task<Result<IReadOnlyList<PublicTranslation>>> ListByTenantAsync(
+        Guid tenantId, string? workflowStatus, CancellationToken cancellationToken = default)
+    {
+        var query = _db.PublicTranslations.Where(p => p.TenantId == tenantId);
+        if (!string.IsNullOrWhiteSpace(workflowStatus))
+            query = query.Where(p => p.WorkflowStatus == workflowStatus);
+
+        var rows = await query
+            .OrderByDescending(p => p.UpdatedAt)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<PublicTranslation>>.Success(rows);
+    }
+
+    public async Task<Result<PublicTranslation>> UpdateContentAsync(
+        Guid publicTranslationId,
+        string editedContent,
+        Guid actorId,
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await _db.PublicTranslations
+            .FirstOrDefaultAsync(p => p.Id == publicTranslationId, cancellationToken)
+            .ConfigureAwait(false);
+        if (existing is null)
+            return Result<PublicTranslation>.Failure($"PublicTranslation {publicTranslationId} not found.");
+        if (existing.WorkflowStatus != "draft")
+            return Result<PublicTranslation>.Failure(
+                $"Cannot edit a public translation in '{existing.WorkflowStatus}' state. Only 'draft' is editable.");
+
+        var now = DateTimeOffset.UtcNow;
+        existing.EditedContent = editedContent;
+        existing.UpdatedAt = now;
+
+        _db.PublicTranslationEvents.Add(new PublicTranslationEvent
+        {
+            PublicTranslationId = existing.Id,
+            EventType = "edited",
+            ActorId = actorId,
+            Notes = null,
+            OccurredAt = now,
+        });
+
+        try
+        {
+            await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return Result<PublicTranslation>.Success(existing);
+        }
+        catch (DbUpdateException ex)
+        {
+            return Result<PublicTranslation>.Failure(
+                $"Failed to update public translation: {ex.GetBaseException().Message}");
+        }
+    }
+
     public async Task<Result<PublicTranslation>> AddAsync(PublicTranslation publicTranslation, CancellationToken cancellationToken = default)
     {
         if (publicTranslation is null) return Result<PublicTranslation>.Failure("PublicTranslation is required.");
