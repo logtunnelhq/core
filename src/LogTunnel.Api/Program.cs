@@ -86,6 +86,25 @@ if (platformEnabled)
     builder.Services.AddLogTunnelPlatform(builder.Configuration);
 }
 
+// ---------- CORS ----------
+//
+// Allowed origin comes from LogTunnel:Cors:Origin
+// (LOGTUNNEL__CORS__ORIGIN env var). Defaults to the Vite dev server
+// at http://localhost:5173 so the local React frontend works without
+// extra config. AllowCredentials is on so the dashboard can send the
+// JWT in an Authorization header alongside cookies if it ever needs to.
+const string CorsPolicyName = "LogTunnelDashboard";
+var corsOrigin = builder.Configuration.GetSection("LogTunnel:Cors")["Origin"]
+                 ?? "http://localhost:5173";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(CorsPolicyName, policy => policy
+        .WithOrigins(corsOrigin)
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials());
+});
+
 // ---------- Api services ----------
 
 builder.Services.AddSingleton<LogTunnelProjectConfigStore>();
@@ -110,6 +129,10 @@ var app = builder.Build();
 
 app.UseSerilogRequestLogging();
 app.UseStatusCodePages();
+
+// CORS must run before auth so preflight OPTIONS requests succeed
+// without an Authorization header.
+app.UseCors(CorsPolicyName);
 
 if (platformEnabled)
 {
