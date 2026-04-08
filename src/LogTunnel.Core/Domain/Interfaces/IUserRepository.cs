@@ -34,6 +34,17 @@ public interface IUserRepository
     Task<Result<User>> FindByEmailAsync(Guid tenantId, string email, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Look up a user by login email across all tenants. Used by
+    /// <c>/auth/login</c> where the caller has only an email and no
+    /// tenant context. Returns the first row whose email matches
+    /// (case-sensitive). Phase 2 v1 ships with one bootstrap tenant
+    /// so collisions are not yet a concern; promoting this to a
+    /// global unique constraint is a follow-up if multi-tenant login
+    /// becomes a real requirement.
+    /// </summary>
+    Task<Result<User>> FindByEmailAcrossTenantsAsync(string email, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Resolve a user from a git author email (case-insensitive). Used by
     /// the webhook ingester to populate <see cref="Commit.AuthorUserId"/>.
     /// </summary>

@@ -52,6 +52,8 @@ public sealed class LogTunnelDbContext : DbContext
     public DbSet<PublicTranslationEvent> PublicTranslationEvents => Set<PublicTranslationEvent>();
     public DbSet<StandupExport> StandupExports => Set<StandupExport>();
     public DbSet<WebhookDelivery> WebhookDeliveries => Set<WebhookDelivery>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Invitation> Invitations => Set<Invitation>();
 
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -65,6 +65,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPublicTranslationRepository, PublicTranslationRepository>();
         services.AddScoped<IStandupExportRepository, StandupExportRepository>();
         services.AddScoped<IWebhookDeliveryRepository, WebhookDeliveryRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IInvitationRepository, InvitationRepository>();
 
         return services;
     }

@@ -24,6 +24,8 @@ using LogTunnel.Core.Domain;
 using LogTunnel.Core.Domain.Interfaces;
 using LogTunnel.Core.Llm;
 using LogTunnel.Core.Services;
+using LogTunnel.Infrastructure;
+using LogTunnel.Platform;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Serilog;
@@ -70,6 +72,20 @@ builder.Services.AddSingleton<IPromptTemplateProvider>(serviceProvider =>
 
 builder.Services.AddSingleton<IChangelogTranslator, ChangelogTranslatorService>();
 
+// ---------- LogTunnel.Infrastructure (Phase 2 data layer) ----------
+//
+// Postgres-backed DbContext + repositories. Wired in only when a
+// connection string is supplied — Phase 1 self-hosters who run the API
+// without a database can leave Postgres__ConnectionString empty and the
+// /translate / /configure endpoints continue to work in stateless mode.
+var postgresConnectionString = builder.Configuration.GetSection("Postgres")["ConnectionString"];
+var platformEnabled = !string.IsNullOrWhiteSpace(postgresConnectionString);
+if (platformEnabled)
+{
+    builder.Services.AddLogTunnelInfrastructure(postgresConnectionString!);
+    builder.Services.AddLogTunnelPlatform(builder.Configuration);
+}
+
 // ---------- Api services ----------
 
 builder.Services.AddSingleton<LogTunnelProjectConfigStore>();
@@ -94,6 +110,13 @@ var app = builder.Build();
 
 app.UseSerilogRequestLogging();
 app.UseStatusCodePages();
+
+if (platformEnabled)
+{
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.MapLogTunnelPlatformEndpoints();
+}
 
 // ---------- Endpoints ----------
 

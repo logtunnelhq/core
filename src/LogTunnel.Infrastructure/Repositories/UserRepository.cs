@@ -50,6 +50,19 @@ internal sealed class UserRepository : IUserRepository
             : Result<User>.Success(user);
     }
 
+    public async Task<Result<User>> FindByEmailAcrossTenantsAsync(string email, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return Result<User>.Failure("Email must not be empty.");
+
+        var user = await _db.Users
+            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken)
+            .ConfigureAwait(false);
+        return user is null
+            ? Result<User>.Failure($"User '{email}' not found.")
+            : Result<User>.Success(user);
+    }
+
     public async Task<Result<User>> FindByGitEmailAsync(Guid tenantId, string gitEmail, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(gitEmail))

@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LogTunnel.Core\LogTunnel.Core.csproj" />
+    <ProjectReference Include="..\LogTunnel.Platform\LogTunnel.Platform.csproj" />
   </ItemGroup>
 
   <ItemGroup>
