@@ -9,17 +9,17 @@ WORKDIR /repo
 #
 # Copy project manifests first so 'dotnet restore' is cached on its own
 # Docker layer and only re-runs when a csproj changes.
-COPY src/Layered.Core/Layered.Core.csproj src/Layered.Core/
-COPY src/Layered.Api/Layered.Api.csproj src/Layered.Api/
+COPY src/LogTunnel.Core/LogTunnel.Core.csproj src/LogTunnel.Core/
+COPY src/LogTunnel.Api/LogTunnel.Api.csproj src/LogTunnel.Api/
 
-RUN dotnet restore src/Layered.Api/Layered.Api.csproj
+RUN dotnet restore src/LogTunnel.Api/LogTunnel.Api.csproj
 
 # Copy the rest of the build context. .dockerignore filters out bin/,
 # obj/, .git/, IDE files, the Cli/Tests projects we do not need at
 # runtime, etc.
 COPY . .
 
-RUN dotnet publish src/Layered.Api/Layered.Api.csproj \
+RUN dotnet publish src/LogTunnel.Api/LogTunnel.Api.csproj \
     --configuration Release \
     --no-restore \
     --output /app/publish
@@ -32,8 +32,8 @@ COPY --from=build /app/publish ./
 
 # All other configuration is supplied at run time via environment
 # variables (LLM__PROVIDER, LLM__APIKEY, LLM__MODEL, LLM__BASEURL,
-# Layered__Config__OutputDirectory, ASPNETCORE_ENVIRONMENT, ...).
+# LogTunnel__Config__OutputDirectory, ASPNETCORE_ENVIRONMENT, ...).
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "Layered.Api.dll"]
+ENTRYPOINT ["dotnet", "LogTunnel.Api.dll"]

@@ -1,10 +1,10 @@
 services:
-  layered-api:
+  logtunnel-api:
     build:
       context: .
       dockerfile: Dockerfile
-    image: layered-api:latest
-    container_name: layered-api
+    image: logtunnel-api:latest
+    container_name: logtunnel-api
     ports:
       - "8080:8080"
     environment:
@@ -17,12 +17,12 @@ services:
       LLM__APIKEY: ""    # set me before booting
       LLM__BASEURL: ""   # optional — leave blank for the provider default
 
-      # Where POST /configure writes .layered.json inside the container.
+      # Where POST /configure writes .logtunnel.json inside the container.
       # Mount a host volume below if you want it to survive restarts.
-      Layered__Config__OutputDirectory: /var/layered
+      LogTunnel__Config__OutputDirectory: /var/logtunnel
 
-    # Uncomment to persist .layered.json across container restarts:
+    # Uncomment to persist .logtunnel.json across container restarts:
     # volumes:
-    #   - ./.layered-data:/var/layered
+    #   - ./.logtunnel-data:/var/logtunnel
 
     restart: unless-stopped

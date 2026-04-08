@@ -1,8 +1,8 @@
-# Layered — Project Context for Claude Code
+# LogTunnel — Project Context for Claude Code
 
 ## What This Product Is
 
-Layered is an open-core SaaS tool that translates raw Git commit messages into
+LogTunnel is an open-core SaaS tool that translates raw Git commit messages into
 audience-specific changelog entries. One set of commits produces four outputs:
 tech lead, manager, CEO, and public-facing. The AI translation layer uses
 Semantic Kernel with the Claude API.
@@ -19,7 +19,7 @@ Semantic Kernel with the Claude API.
 **Paid hosted platform** (private repo):
 - GitHub/GitLab webhook automation
 - Team collaboration and roles
-- Public changelog page (layered.so/changelog/product-name)
+- Public changelog page (logtunnel.so/changelog/product-name)
 - Custom domains
 - Viewer analytics
 - Slack/email delivery
@@ -48,15 +48,15 @@ Semantic Kernel with the Claude API.
 
 ```
 /src
-  /Layered.Core              — domain models, interfaces, business logic
-  /Layered.Infrastructure    — EF Core, repositories, external services
-  /Layered.Api               — minimal API endpoints
-  /Layered.Cli               — dotnet tool CLI
-  /Layered.Platform          — hosted platform features (paid tier)
+  /LogTunnel.Core              — domain models, interfaces, business logic
+  /LogTunnel.Infrastructure    — EF Core, repositories, external services
+  /LogTunnel.Api               — minimal API endpoints
+  /LogTunnel.Cli               — dotnet tool CLI
+  /LogTunnel.Platform          — hosted platform features (paid tier)
 /tests
-  /Layered.Core.Tests
-  /Layered.Infrastructure.Tests
-  /Layered.Api.Tests
+  /LogTunnel.Core.Tests
+  /LogTunnel.Infrastructure.Tests
+  /LogTunnel.Api.Tests
 /docs
   /prompts                   — prompt templates as .md files
 ```
@@ -115,11 +115,11 @@ Each audience gets a distinct system prompt. Prompt files live in /docs/prompts/
 ## Build Order — Follow This Exactly
 
 ### Phase 1 — Open Source Core (build this first)
-1. Domain models and interfaces in Layered.Core
+1. Domain models and interfaces in LogTunnel.Core
 2. ChangelogTranslatorService with Semantic Kernel
 3. Prompt templates for all four audiences
 4. Basic minimal API — POST /translate, POST /configure, GET /health
-5. CLI tool — layered translate command
+5. CLI tool — logtunnel translate command
 6. Unit tests for translator
 7. README and documentation
 
