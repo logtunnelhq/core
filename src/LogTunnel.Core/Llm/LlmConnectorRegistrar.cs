@@ -139,9 +139,20 @@ public sealed class LlmConnectorRegistrar
         var endpoint = new Uri(
             string.IsNullOrWhiteSpace(options.BaseUrl) ? DefaultOllamaEndpoint : options.BaseUrl);
 
+        // Local CPU inference of even small models can take several
+        // minutes per audience, which trivially exceeds the .NET
+        // HttpClient default timeout of 100 seconds. Wrap the connector
+        // in an HttpClient with no timeout so the wall-clock budget is
+        // entirely the caller's CancellationToken.
+        var httpClient = new HttpClient
+        {
+            BaseAddress = endpoint,
+            Timeout = Timeout.InfiniteTimeSpan,
+        };
+
         services.AddOllamaChatCompletion(
             modelId: options.Model,
-            endpoint: endpoint);
+            httpClient: httpClient);
     }
 
     private static string SupportedProviderList() =>
