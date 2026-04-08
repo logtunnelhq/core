@@ -1,8 +1,62 @@
 services:
+
+  # ----------------------------------------------------------------------
+  # postgres — Phase 2 data store. Persists across restarts via the named
+  # volume below. Healthchecked so the migrations + api services wait for
+  # it to actually accept connections before starting.
+  # ----------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: logtunnel-postgres
+    environment:
+      POSTGRES_DB: logtunnel
+      POSTGRES_USER: logtunnel
+      POSTGRES_PASSWORD: logtunnel    # change in any non-local environment
+    ports:
+      - "55432:5432"                  # 55432 on host so it doesn't fight other local Postgres
+    volumes:
+      - logtunnel-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U logtunnel -d logtunnel"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------
+  # migrations — one-shot job that applies the LogTunnel.Infrastructure
+  # EF Core migration against the postgres service. Built from the
+  # 'migrations' target stage in Dockerfile, runs once on 'docker compose
+  # up', and exits 0. The api service depends on this completing
+  # successfully so /health is only ever served against a fully migrated
+  # database.
+  # ----------------------------------------------------------------------
+  migrations:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: migrations
+    image: logtunnel-migrations:latest
+    container_name: logtunnel-migrations
+    environment:
+      CONNECTION_STRING: "Host=postgres;Port=5432;Database=logtunnel;Username=logtunnel;Password=logtunnel"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  # ----------------------------------------------------------------------
+  # logtunnel-api — the Phase 1 minimal API. Postgres is wired in as the
+  # Postgres__ConnectionString env var so the upcoming Phase 2 endpoints
+  # have a database to talk to without changing the compose file later.
+  # The Phase 1 endpoints (/health, /translate, /configure) don't read it
+  # yet.
+  # ----------------------------------------------------------------------
   logtunnel-api:
     build:
       context: .
       dockerfile: Dockerfile
+      target: runtime
     image: logtunnel-api:latest
     container_name: logtunnel-api
     ports:
@@ -11,18 +65,32 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
 
       # Pick any provider — Anthropic, OpenAI, or Ollama.
-      # See README.md for the full provider table.
-      LLM__PROVIDER: Anthropic
-      LLM__MODEL: claude-sonnet-4-20250514
-      LLM__APIKEY: ""    # set me before booting
-      LLM__BASEURL: ""   # optional — leave blank for the provider default
+      # See README.md for the full provider table. Each value below
+      # uses ${VAR:-default} so a host env var (or .env file in this
+      # directory) passes through; otherwise the in-line default wins.
+      LLM__PROVIDER: ${LLM__PROVIDER:-Anthropic}
+      LLM__MODEL: ${LLM__MODEL:-claude-sonnet-4-20250514}
+      LLM__APIKEY: ${LLM__APIKEY:-}
+      LLM__BASEURL: ${LLM__BASEURL:-}
 
       # Where POST /configure writes .logtunnel.json inside the container.
       # Mount a host volume below if you want it to survive restarts.
       LogTunnel__Config__OutputDirectory: /var/logtunnel
 
+      # Phase 2 data layer — read by the upcoming dashboard endpoints.
+      Postgres__ConnectionString: "Host=postgres;Port=5432;Database=logtunnel;Username=logtunnel;Password=logtunnel"
+
     # Uncomment to persist .logtunnel.json across container restarts:
     # volumes:
     #   - ./.logtunnel-data:/var/logtunnel
 
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+
     restart: unless-stopped
+
+volumes:
+  logtunnel-pgdata:
