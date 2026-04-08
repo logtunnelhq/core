@@ -14,15 +14,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-namespace LogTunnel.Infrastructure.Entities;
+using LogTunnel.Core.Common;
+using LogTunnel.Core.Domain.Entities;
+
+namespace LogTunnel.Core.Domain.Interfaces;
 
 /// <summary>
-/// EF Core entity for the <c>project_members</c> join table. Composite
-/// primary key <c>(ProjectId, UserId)</c> is configured in step 4.
+/// Read/write access to <see cref="Team"/> rows.
+/// <see cref="TeamMember"/> joins are managed via
+/// <see cref="IUserRepository.AddToTeamAsync"/>.
 /// </summary>
-public sealed class ProjectMember
+public interface ITeamRepository
 {
-    public Guid ProjectId { get; set; }
-    public Guid UserId { get; set; }
-    public DateTimeOffset JoinedAt { get; set; }
+    /// <summary>Fetch a team by tenant and primary key.</summary>
+    Task<Result<Team>> GetByIdAsync(Guid tenantId, Guid id, CancellationToken cancellationToken = default);
+
+    /// <summary>Insert a new team.</summary>
+    Task<Result<Team>> AddAsync(Team team, CancellationToken cancellationToken = default);
 }

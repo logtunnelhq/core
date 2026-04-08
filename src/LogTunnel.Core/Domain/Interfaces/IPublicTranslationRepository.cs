@@ -1,0 +1,47 @@
+// LogTunnel — Audience-specific changelog translator
+// Copyright (C) 2026 LogTunnel contributors
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+using LogTunnel.Core.Common;
+using LogTunnel.Core.Domain.Entities;
+
+namespace LogTunnel.Core.Domain.Interfaces;
+
+/// <summary>
+/// Read/write access to <see cref="PublicTranslation"/> rows and the
+/// append-only <see cref="PublicTranslationEvent"/> trail. Models the
+/// marketing edit / approve / publish workflow.
+/// </summary>
+public interface IPublicTranslationRepository
+{
+    /// <summary>
+    /// Open a draft public translation on top of an existing
+    /// <see cref="Translation"/> whose audience is <c>"Public"</c>. The
+    /// new row starts with <c>workflow_status = 'draft'</c>.
+    /// </summary>
+    Task<Result<PublicTranslation>> AddAsync(PublicTranslation publicTranslation, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Move a public translation through the workflow:
+    /// <c>draft → approved → published</c>. Each transition appends a
+    /// <see cref="PublicTranslationEvent"/> for audit.
+    /// </summary>
+    Task<Result<PublicTranslation>> TransitionStatusAsync(
+        Guid publicTranslationId,
+        string newStatus,
+        Guid actorId,
+        string? notes,
+        CancellationToken cancellationToken = default);
+}

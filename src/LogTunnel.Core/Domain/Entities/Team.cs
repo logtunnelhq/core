@@ -14,32 +14,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-namespace LogTunnel.Infrastructure.Entities;
+namespace LogTunnel.Core.Domain.Entities;
 
 /// <summary>
-/// EF Core entity for the <c>repositories</c> table. Named
-/// <c>CodeRepository</c> rather than <c>Repository</c> to avoid colliding
-/// with the data-access "repository" pattern naming used elsewhere in
-/// the project — same reason
-/// <c>ICodeRepositoryRepository</c> carries the <c>Code</c> prefix.
-/// Step 4 configures the table name override.
+/// EF Core entity for the <c>teams</c> table.
 /// </summary>
-public sealed class CodeRepository
+public sealed class Team
 {
     public Guid Id { get; set; }
     public Guid TenantId { get; set; }
-
-    /// <summary>Git host. Currently only <c>"github"</c>.</summary>
-    public string Host { get; set; } = "github";
-
-    /// <summary>Canonical https url, e.g. <c>"https://github.com/acme/web"</c>.</summary>
-    public string RemoteUrl { get; set; } = string.Empty;
-
-    public string DefaultBranch { get; set; } = "main";
-
-    /// <summary>Per-repo HMAC secret used to verify incoming GitHub webhook signatures.</summary>
-    public string WebhookSecret { get; set; } = string.Empty;
-
+    public string Name { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset UpdatedAt { get; set; }
 }

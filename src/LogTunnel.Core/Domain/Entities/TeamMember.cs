@@ -14,17 +14,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-namespace LogTunnel.Infrastructure.Entities;
+namespace LogTunnel.Core.Domain.Entities;
 
 /// <summary>
-/// EF Core entity for the <c>commit_projects</c> materialised join table.
-/// Populated at webhook-ingest time by walking
-/// <see cref="RepositoryProjectMapping"/> entries against
-/// <see cref="Commit.ChangedFiles"/>. Composite primary key
-/// <c>(CommitId, ProjectId)</c> is configured in step 4.
+/// EF Core entity for the <c>team_members</c> join table. Composite
+/// primary key <c>(TeamId, UserId)</c> is configured in step 4.
+/// <see cref="Role"/> = <c>"lead"</c> is what makes a user a team lead
+/// for that specific team — independent of <see cref="User.DashboardRole"/>.
 /// </summary>
-public sealed class CommitProject
+public sealed class TeamMember
 {
-    public Guid CommitId { get; set; }
-    public Guid ProjectId { get; set; }
+    public Guid TeamId { get; set; }
+    public Guid UserId { get; set; }
+
+    /// <summary><c>"member"</c> or <c>"lead"</c>.</summary>
+    public string Role { get; set; } = "member";
+
+    public DateTimeOffset JoinedAt { get; set; }
 }

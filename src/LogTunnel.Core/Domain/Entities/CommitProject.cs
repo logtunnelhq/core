@@ -14,25 +14,17 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-namespace LogTunnel.Infrastructure.Entities;
+namespace LogTunnel.Core.Domain.Entities;
 
 /// <summary>
-/// EF Core entity for the <c>public_translation_events</c> append-only
-/// audit trail. One row per workflow transition or edit on a
-/// <see cref="PublicTranslation"/>.
+/// EF Core entity for the <c>commit_projects</c> materialised join table.
+/// Populated at webhook-ingest time by walking
+/// <see cref="RepositoryProjectMapping"/> entries against
+/// <see cref="Commit.ChangedFiles"/>. Composite primary key
+/// <c>(CommitId, ProjectId)</c> is configured in step 4.
 /// </summary>
-public sealed class PublicTranslationEvent
+public sealed class CommitProject
 {
-    public Guid Id { get; set; }
-    public Guid PublicTranslationId { get; set; }
-
-    /// <summary><c>"edited"</c>, <c>"approved"</c>, <c>"rejected"</c>, <c>"published"</c>, or <c>"unpublished"</c>.</summary>
-    public string EventType { get; set; } = string.Empty;
-
-    public Guid ActorId { get; set; }
-
-    /// <summary>Optional one-line note from the actor.</summary>
-    public string? Notes { get; set; }
-
-    public DateTimeOffset OccurredAt { get; set; }
+    public Guid CommitId { get; set; }
+    public Guid ProjectId { get; set; }
 }

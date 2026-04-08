@@ -23,7 +23,7 @@ namespace LogTunnel.Infrastructure.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pgcrypto");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.CodeRepository", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.CodeRepository", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -80,7 +80,7 @@ namespace LogTunnel.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.Commit", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.Commit", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -161,7 +161,7 @@ namespace LogTunnel.Infrastructure.Migrations
                     b.ToTable("commits", (string)null);
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.CommitProject", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.CommitProject", b =>
                 {
                     b.Property<Guid>("CommitId")
                         .HasColumnType("uuid")
@@ -179,7 +179,7 @@ namespace LogTunnel.Infrastructure.Migrations
                     b.ToTable("commit_projects", (string)null);
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.DailyLog", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.DailyLog", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -258,7 +258,7 @@ namespace LogTunnel.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.DailyLogRevision", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.DailyLogRevision", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -318,7 +318,7 @@ namespace LogTunnel.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.Project", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.Project", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -364,7 +364,7 @@ namespace LogTunnel.Infrastructure.Migrations
                     b.ToTable("projects", (string)null);
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.ProjectMember", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.ProjectMember", b =>
                 {
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uuid")
@@ -388,7 +388,7 @@ namespace LogTunnel.Infrastructure.Migrations
                     b.ToTable("project_members", (string)null);
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.PublicTranslation", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.PublicTranslation", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -464,7 +464,7 @@ namespace LogTunnel.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.PublicTranslationEvent", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.PublicTranslationEvent", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -509,7 +509,7 @@ namespace LogTunnel.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.RepositoryProjectMapping", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.RepositoryProjectMapping", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -552,7 +552,7 @@ namespace LogTunnel.Infrastructure.Migrations
                     b.ToTable("repository_project_mappings", (string)null);
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.StandupExport", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.StandupExport", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -614,7 +614,7 @@ namespace LogTunnel.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.Team", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.Team", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -656,7 +656,7 @@ namespace LogTunnel.Infrastructure.Migrations
                     b.ToTable("teams", (string)null);
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.TeamMember", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.TeamMember", b =>
                 {
                     b.Property<Guid>("TeamId")
                         .HasColumnType("uuid")
@@ -688,7 +688,7 @@ namespace LogTunnel.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.Tenant", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.Tenant", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -768,7 +768,7 @@ namespace LogTunnel.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.Translation", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.Translation", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -858,7 +858,7 @@ namespace LogTunnel.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.User", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -929,7 +929,7 @@ namespace LogTunnel.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.WebhookDelivery", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.WebhookDelivery", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -995,235 +995,235 @@ namespace LogTunnel.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.CodeRepository", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.CodeRepository", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Tenant", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Tenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.Commit", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.Commit", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.User", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("AuthorUserId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.CodeRepository", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.CodeRepository", null)
                         .WithMany()
                         .HasForeignKey("RepositoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Tenant", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Tenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.CommitProject", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.CommitProject", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Commit", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Commit", null)
                         .WithMany()
                         .HasForeignKey("CommitId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Project", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Project", null)
                         .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.DailyLog", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.DailyLog", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Tenant", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Tenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.User", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.DailyLogRevision", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.DailyLogRevision", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.DailyLog", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.DailyLog", null)
                         .WithMany()
                         .HasForeignKey("DailyLogId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.User", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("EditedBy")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.Project", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.Project", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Tenant", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Tenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.ProjectMember", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.ProjectMember", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Project", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Project", null)
                         .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.User", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.PublicTranslation", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.PublicTranslation", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.User", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("ApprovedBy")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Tenant", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Tenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Translation", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Translation", null)
                         .WithMany()
                         .HasForeignKey("TranslationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.PublicTranslationEvent", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.PublicTranslationEvent", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.User", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("ActorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.PublicTranslation", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.PublicTranslation", null)
                         .WithMany()
                         .HasForeignKey("PublicTranslationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.RepositoryProjectMapping", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.RepositoryProjectMapping", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Project", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Project", null)
                         .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.CodeRepository", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.CodeRepository", null)
                         .WithMany()
                         .HasForeignKey("RepositoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.StandupExport", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.StandupExport", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.User", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("ExportedBy")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Project", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Project", null)
                         .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Team", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Team", null)
                         .WithMany()
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Tenant", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Tenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.Team", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.Team", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Tenant", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Tenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.TeamMember", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.TeamMember", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Team", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Team", null)
                         .WithMany()
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.User", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.Translation", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.Translation", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.User", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("GeneratedBy")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Tenant", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Tenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.User", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.User", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Tenant", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Tenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("LogTunnel.Infrastructure.Entities.WebhookDelivery", b =>
+            modelBuilder.Entity("LogTunnel.Core.Domain.Entities.WebhookDelivery", b =>
                 {
-                    b.HasOne("LogTunnel.Infrastructure.Entities.CodeRepository", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.CodeRepository", null)
                         .WithMany()
                         .HasForeignKey("RepositoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LogTunnel.Infrastructure.Entities.Tenant", null)
+                    b.HasOne("LogTunnel.Core.Domain.Entities.Tenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Cascade)

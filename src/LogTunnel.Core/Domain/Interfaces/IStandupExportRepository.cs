@@ -14,17 +14,18 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-namespace LogTunnel.Infrastructure.Entities;
+using LogTunnel.Core.Common;
+using LogTunnel.Core.Domain.Entities;
+
+namespace LogTunnel.Core.Domain.Interfaces;
 
 /// <summary>
-/// EF Core entity for the <c>teams</c> table.
+/// Append-only audit / analytics for the "team lead clicked Export"
+/// action. Reads are limited to listing recent exports for a tenant
+/// and date.
 /// </summary>
-public sealed class Team
+public interface IStandupExportRepository
 {
-    public Guid Id { get; set; }
-    public Guid TenantId { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Slug { get; set; } = string.Empty;
-    public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset UpdatedAt { get; set; }
+    /// <summary>Insert a new stand-up export record.</summary>
+    Task<Result<StandupExport>> AddAsync(StandupExport export, CancellationToken cancellationToken = default);
 }

@@ -14,18 +14,29 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-namespace LogTunnel.Infrastructure.Entities;
+namespace LogTunnel.Core.Domain.Entities;
 
 /// <summary>
-/// EF Core entity for the <c>projects</c> table.
+/// EF Core entity for the <c>daily_log_revisions</c> append-only audit
+/// trail. Once <see cref="DailyLog.FrozenAt"/> is set, every subsequent
+/// edit writes a new row here instead of mutating the parent
+/// <see cref="DailyLog"/>.
 /// </summary>
-public sealed class Project
+public sealed class DailyLogRevision
 {
     public Guid Id { get; set; }
-    public Guid TenantId { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Slug { get; set; } = string.Empty;
-    public string? Description { get; set; }
-    public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset UpdatedAt { get; set; }
+    public Guid DailyLogId { get; set; }
+
+    public string RawNote { get; set; } = string.Empty;
+
+    public Guid[] ProjectTags { get; set; } = Array.Empty<Guid>();
+
+    public string? BlockerStatus { get; set; }
+    public string? BlockerNote { get; set; }
+
+    /// <summary>Optional one-line reason supplied by the editor.</summary>
+    public string? EditReason { get; set; }
+
+    public Guid EditedBy { get; set; }
+    public DateTimeOffset EditedAt { get; set; }
 }

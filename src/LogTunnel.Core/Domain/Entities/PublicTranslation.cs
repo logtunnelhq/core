@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-namespace LogTunnel.Infrastructure.Entities;
+namespace LogTunnel.Core.Domain.Entities;
 
 /// <summary>
 /// EF Core entity for the <c>public_translations</c> table — marketing's
