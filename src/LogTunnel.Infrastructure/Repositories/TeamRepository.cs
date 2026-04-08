@@ -47,6 +47,19 @@ internal sealed class TeamRepository : ITeamRepository
         return Result<IReadOnlyList<Team>>.Success(rows);
     }
 
+    public async Task<Result<IReadOnlyList<UserTeamMembership>>> ListByUserAsync(
+        Guid tenantId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var rows = await (
+            from tm in _db.TeamMembers
+            join t in _db.Teams on tm.TeamId equals t.Id
+            where tm.UserId == userId && t.TenantId == tenantId
+            orderby t.Name
+            select new UserTeamMembership(t, tm.Role)
+        ).ToListAsync(cancellationToken).ConfigureAwait(false);
+        return Result<IReadOnlyList<UserTeamMembership>>.Success(rows);
+    }
+
     public async Task<Result<IReadOnlyList<TeamMembership>>> ListMembersAsync(Guid teamId, CancellationToken cancellationToken = default)
     {
         var rows = await (

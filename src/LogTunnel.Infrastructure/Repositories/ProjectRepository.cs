@@ -47,6 +47,19 @@ internal sealed class ProjectRepository : IProjectRepository
         return Result<IReadOnlyList<Project>>.Success(rows);
     }
 
+    public async Task<Result<IReadOnlyList<Project>>> ListByUserAsync(
+        Guid tenantId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var rows = await (
+            from pm in _db.ProjectMembers
+            join p in _db.Projects on pm.ProjectId equals p.Id
+            where pm.UserId == userId && p.TenantId == tenantId
+            orderby p.Name
+            select p
+        ).ToListAsync(cancellationToken).ConfigureAwait(false);
+        return Result<IReadOnlyList<Project>>.Success(rows);
+    }
+
     public async Task<Result<IReadOnlyList<User>>> ListMembersAsync(Guid projectId, CancellationToken cancellationToken = default)
     {
         var rows = await (

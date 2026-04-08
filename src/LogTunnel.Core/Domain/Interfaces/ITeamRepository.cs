@@ -33,6 +33,15 @@ public interface ITeamRepository
     Task<Result<IReadOnlyList<Team>>> ListByTenantAsync(Guid tenantId, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// List the teams a specific user belongs to, paired with their
+    /// membership role on each. Used by the team-lead dashboard's
+    /// "my teams" picker — users can see their own memberships
+    /// without admin privileges.
+    /// </summary>
+    Task<Result<IReadOnlyList<UserTeamMembership>>> ListByUserAsync(
+        Guid tenantId, Guid userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// List the members of a team — joined against
     /// <see cref="User"/> rows so callers see display names alongside
     /// the membership role (<c>"member"</c> or <c>"lead"</c>).
@@ -50,3 +59,9 @@ public interface ITeamRepository
 /// that team.
 /// </summary>
 public sealed record TeamMembership(User User, string Role);
+
+/// <summary>
+/// Result row for <see cref="ITeamRepository.ListByUserAsync"/>.
+/// Carries the team plus the user's membership role on it.
+/// </summary>
+public sealed record UserTeamMembership(Team Team, string Role);

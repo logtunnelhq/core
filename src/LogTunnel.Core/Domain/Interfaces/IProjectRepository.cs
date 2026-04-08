@@ -32,6 +32,14 @@ public interface IProjectRepository
     /// <summary>List every project in the tenant, ordered by name.</summary>
     Task<Result<IReadOnlyList<Project>>> ListByTenantAsync(Guid tenantId, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// List the projects a specific user belongs to. Used by the
+    /// manager dashboard's "my projects" picker — managers can see
+    /// their own project memberships without admin privileges.
+    /// </summary>
+    Task<Result<IReadOnlyList<Project>>> ListByUserAsync(
+        Guid tenantId, Guid userId, CancellationToken cancellationToken = default);
+
     /// <summary>List the members of a project, joined against the user table.</summary>
     Task<Result<IReadOnlyList<User>>> ListMembersAsync(Guid projectId, CancellationToken cancellationToken = default);
 
