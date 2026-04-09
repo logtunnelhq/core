@@ -155,6 +155,7 @@ public sealed class TranslateCommand
 
             var request = new TranslationRequest(
                 RawCommits: rawCommits,
+                ChangedFiles: null,
                 Context: projectConfig.Context,
                 Audiences: audiences);
 

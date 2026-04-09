@@ -48,3 +48,5 @@ preamble, no closing line.
 # Raw commits
 
 {{$raw_commits}}
+
+{{$changed_files}}

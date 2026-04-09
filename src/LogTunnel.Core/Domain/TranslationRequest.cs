@@ -22,10 +22,17 @@ namespace LogTunnel.Core.Domain;
 /// audience configurations needed to produce one changelog per audience.
 /// </summary>
 /// <param name="RawCommits">Raw Git commit messages, typically newline-separated.</param>
+/// <param name="ChangedFiles">
+/// Optional pre-formatted list of file paths touched by the commits
+/// (one path per line). When present the LLM can cross-check the
+/// commit messages against the actual file changes. When null the
+/// prompt section is omitted gracefully.
+/// </param>
 /// <param name="Context">Company context used to frame language and terminology.</param>
 /// <param name="Audiences">Audience configurations to render outputs for.</param>
 public record TranslationRequest(
     string RawCommits,
+    string? ChangedFiles,
     CompanyContext Context,
     IReadOnlyList<AudienceConfig> Audiences
 );

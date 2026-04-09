@@ -79,6 +79,7 @@ public class ChangelogTranslatorServiceTests
         var translator = CreateTranslator(out _, out _);
         var request = new TranslationRequest(
             RawCommits: rawCommits,
+            ChangedFiles: null,
             Context: SampleContext,
             Audiences: new[] { TechLeadAudience });
 
@@ -94,6 +95,7 @@ public class ChangelogTranslatorServiceTests
         var translator = CreateTranslator(out _, out _);
         var request = new TranslationRequest(
             RawCommits: "fix: bug",
+            ChangedFiles: null,
             Context: SampleContext,
             Audiences: Array.Empty<AudienceConfig>());
 
@@ -109,6 +111,7 @@ public class ChangelogTranslatorServiceTests
         var translator = CreateTranslator(out _, out _);
         var request = new TranslationRequest(
             RawCommits: "fix: bug",
+            ChangedFiles: null,
             Context: SampleContext,
             Audiences: new[] { TechLeadAudience, TechLeadAudience });
 
@@ -127,6 +130,7 @@ public class ChangelogTranslatorServiceTests
 
         var request = new TranslationRequest(
             RawCommits: "fix: bug",
+            ChangedFiles: null,
             Context: SampleContext,
             Audiences: new[] { TechLeadAudience, ManagerAudience, CeoAudience });
 
@@ -173,6 +177,7 @@ public class ChangelogTranslatorServiceTests
         var translator = CreateTranslator(fake, out _);
         var request = new TranslationRequest(
             RawCommits: "fix: bug",
+            ChangedFiles: null,
             Context: SampleContext,
             Audiences: audiences);
 
@@ -202,6 +207,7 @@ public class ChangelogTranslatorServiceTests
         var translator = CreateTranslator(fake, out _);
         var request = new TranslationRequest(
             RawCommits: "fix: bug",
+            ChangedFiles: null,
             Context: SampleContext,
             Audiences: new[] { TechLeadAudience });
 

@@ -45,3 +45,5 @@ clearly and grouped sensibly.
 # Raw commits
 
 {{$raw_commits}}
+
+{{$changed_files}}

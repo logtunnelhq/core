@@ -42,3 +42,5 @@ remain. They are not reading the diffs.
 # Raw commits
 
 {{$raw_commits}}
+
+{{$changed_files}}

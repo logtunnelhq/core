@@ -43,3 +43,5 @@ customers.
 # Raw commits
 
 {{$raw_commits}}
+
+{{$changed_files}}

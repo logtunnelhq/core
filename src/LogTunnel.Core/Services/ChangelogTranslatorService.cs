@@ -32,6 +32,7 @@ namespace LogTunnel.Core.Services;
 public sealed class ChangelogTranslatorService : IChangelogTranslator
 {
     private const string ArgRawCommits = "raw_commits";
+    private const string ArgChangedFiles = "changed_files";
     private const string ArgProductDescription = "product_description";
     private const string ArgTargetCustomers = "target_customers";
     private const string ArgTerminology = "terminology";
@@ -127,6 +128,7 @@ public sealed class ChangelogTranslatorService : IChangelogTranslator
         var arguments = new KernelArguments
         {
             [ArgRawCommits] = request.RawCommits,
+            [ArgChangedFiles] = FormatChangedFilesSection(request.ChangedFiles),
             [ArgProductDescription] = request.Context.ProductDescription,
             [ArgTargetCustomers] = request.Context.TargetCustomers,
             [ArgTerminology] = request.Context.Terminology,
@@ -143,5 +145,30 @@ public sealed class ChangelogTranslatorService : IChangelogTranslator
 
         var text = invocationResult.GetValue<string>()?.Trim() ?? string.Empty;
         return (audience.Type, text);
+    }
+
+    /// <summary>
+    /// When <paramref name="changedFiles"/> is non-empty, wraps it in a
+    /// self-contained prompt section with a header and instructions so
+    /// the LLM knows how to interpret it. When null or empty, returns
+    /// an empty string so the <c>{{$changed_files}}</c> placeholder
+    /// in the prompt template expands to nothing.
+    /// </summary>
+    private static string FormatChangedFilesSection(string? changedFiles)
+    {
+        if (string.IsNullOrWhiteSpace(changedFiles))
+            return string.Empty;
+
+        return $"""
+            # Changed files (for context)
+
+            These file paths were actually modified by the commits above. Use them
+            to cross-check the commit messages — if a message says one thing but
+            the file paths tell a different story, describe what the file paths
+            indicate rather than blindly trusting the message. Only reference file
+            paths that are relevant to the changelog entry; do not list every file.
+
+            {changedFiles}
+            """;
     }
 }

@@ -28,12 +28,14 @@ namespace LogTunnel.Api.Contracts;
 /// <param name="Audiences">Audience configurations to render outputs for.</param>
 public sealed record TranslateRequest(
     string RawCommits,
+    string? ChangedFiles,
     CompanyContextDto Context,
     IReadOnlyList<AudienceConfigDto> Audiences)
 {
     /// <summary>Map this DTO to a <see cref="TranslationRequest"/> for the translator service.</summary>
     public TranslationRequest ToDomain() => new(
         RawCommits: RawCommits,
+        ChangedFiles: ChangedFiles,
         Context: Context.ToDomain(),
         Audiences: Audiences.Select(a => a.ToDomain()).ToList());
 }
