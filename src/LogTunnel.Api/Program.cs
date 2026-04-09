@@ -25,7 +25,6 @@ using LogTunnel.Core.Domain.Interfaces;
 using LogTunnel.Core.Llm;
 using LogTunnel.Core.Services;
 using LogTunnel.Infrastructure;
-using LogTunnel.Platform;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
 using Serilog;
@@ -72,18 +71,21 @@ builder.Services.AddSingleton<IPromptTemplateProvider>(serviceProvider =>
 
 builder.Services.AddSingleton<IChangelogTranslator, ChangelogTranslatorService>();
 
-// ---------- LogTunnel.Infrastructure (Phase 2 data layer) ----------
+// ---------- LogTunnel.Infrastructure (optional Postgres data layer) ----------
 //
 // Postgres-backed DbContext + repositories. Wired in only when a
-// connection string is supplied — Phase 1 self-hosters who run the API
-// without a database can leave Postgres__ConnectionString empty and the
+// connection string is supplied — self-hosters who run the API without
+// a database can leave Postgres__ConnectionString empty and the
 // /translate / /configure endpoints continue to work in stateless mode.
+//
+// Hosted-platform features (auth, dashboards, webhooks, etc.) live in
+// the separate LogTunnel.Platform repo and consume this data layer
+// through the same AddLogTunnelInfrastructure extension.
 var postgresConnectionString = builder.Configuration.GetSection("Postgres")["ConnectionString"];
-var platformEnabled = !string.IsNullOrWhiteSpace(postgresConnectionString);
-if (platformEnabled)
+var dataLayerEnabled = !string.IsNullOrWhiteSpace(postgresConnectionString);
+if (dataLayerEnabled)
 {
     builder.Services.AddLogTunnelInfrastructure(postgresConnectionString!);
-    builder.Services.AddLogTunnelPlatform(builder.Configuration);
 }
 
 // ---------- CORS ----------
@@ -130,16 +132,7 @@ var app = builder.Build();
 app.UseSerilogRequestLogging();
 app.UseStatusCodePages();
 
-// CORS must run before auth so preflight OPTIONS requests succeed
-// without an Authorization header.
 app.UseCors(CorsPolicyName);
-
-if (platformEnabled)
-{
-    app.UseAuthentication();
-    app.UseAuthorization();
-    app.MapLogTunnelPlatformEndpoints();
-}
 
 // ---------- Endpoints ----------
 

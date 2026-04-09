@@ -20,11 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- The integration test projects poke at internal repository
+    <!-- The integration test project pokes at internal repository
          classes directly to round-trip them against Testcontainers
          Postgres without spinning up a full DI container. -->
     <InternalsVisibleTo Include="LogTunnel.Infrastructure.Tests" />
-    <InternalsVisibleTo Include="LogTunnel.Platform.Tests" />
   </ItemGroup>
 
   <ItemGroup>
