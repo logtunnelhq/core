@@ -99,6 +99,13 @@ public sealed class TranslateCommand
             Description = "Optional directory to write per-audience .md files into. When omitted, output is printed to stdout.",
         };
 
+        var filesOption = new Option<FileInfo?>("--files", "-f")
+        {
+            Description = "Optional path to a file listing changed file paths (one per line). " +
+                          "When provided, these paths are passed to the LLM alongside the commit messages " +
+                          "so it can cross-check messages against actual file changes.",
+        };
+
         var command = new Command(
             "translate",
             "Translate raw Git commits into one changelog per audience.")
@@ -107,6 +114,7 @@ public sealed class TranslateCommand
             configOption,
             audienceOption,
             outputOption,
+            filesOption,
         };
 
         command.SetAction((parseResult, cancellationToken) => RunAsync(
@@ -114,6 +122,7 @@ public sealed class TranslateCommand
             configFile: parseResult.GetValue(configOption)!,
             audienceFilter: parseResult.GetValue(audienceOption),
             outputDirectory: parseResult.GetValue(outputOption),
+            changedFilesFile: parseResult.GetValue(filesOption),
             cancellationToken: cancellationToken));
 
         return command;
@@ -124,6 +133,7 @@ public sealed class TranslateCommand
         FileInfo configFile,
         AudienceType? audienceFilter,
         DirectoryInfo? outputDirectory,
+        FileInfo? changedFilesFile,
         CancellationToken cancellationToken)
     {
         try
@@ -153,9 +163,22 @@ public sealed class TranslateCommand
                 return 1;
             }
 
+            string? changedFiles = null;
+            if (changedFilesFile is not null)
+            {
+                if (!changedFilesFile.Exists)
+                {
+                    Console.Error.WriteLine($"Changed-files file not found: {changedFilesFile.FullName}");
+                    return 1;
+                }
+                changedFiles = await File.ReadAllTextAsync(changedFilesFile.FullName, cancellationToken).ConfigureAwait(false);
+                if (string.IsNullOrWhiteSpace(changedFiles))
+                    changedFiles = null;
+            }
+
             var request = new TranslationRequest(
                 RawCommits: rawCommits,
-                ChangedFiles: null,
+                ChangedFiles: changedFiles,
                 Context: projectConfig.Context,
                 Audiences: audiences);
 
