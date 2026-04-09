@@ -40,7 +40,7 @@ Semantic Kernel with the Claude API.
 | API style | Minimal API (no controllers) |
 | Auth | ASP.NET Core Identity + JWT |
 | Payments | Stripe Billing |
-| Frontend | React 18 (minimal, only for hosted platform) |
+| Frontend | React 18 (lives in the platform repo, not here) |
 | Hosting | Azure (developer is Azure-familiar) |
 | License | AGPL for core, proprietary for platform |
 
@@ -52,14 +52,28 @@ Semantic Kernel with the Claude API.
   /LogTunnel.Infrastructure    — EF Core, repositories, external services
   /LogTunnel.Api               — minimal API endpoints
   /LogTunnel.Cli               — dotnet tool CLI
-  /LogTunnel.Platform          — hosted platform features (paid tier)
 /tests
   /LogTunnel.Core.Tests
   /LogTunnel.Infrastructure.Tests
-  /LogTunnel.Api.Tests
 /docs
   /prompts                   — prompt templates as .md files
 ```
+
+> **Post-split note.** `LogTunnel.Platform`, the React frontend
+> under `web/`, and `tests/LogTunnel.Platform.Tests/` no longer
+> live in this repo. They were moved to the private platform repo
+> at **github.com/logtunnelhq/platform** in April 2026 and the
+> matching paths were scrubbed from this repo's git history with
+> `git filter-repo`. The core repo now contains only the open
+> source components — translator engine, prompts, CLI, minimal
+> API, and the data layer (EF Core entities + repositories) that
+> the platform repo consumes via a git submodule.
+>
+> **Never commit `LogTunnel.Platform`, `web/`, or
+> `LogTunnel.Platform.Tests` back into this repo.** Anything that
+> turns the open-core primitives into a hosted SaaS — auth,
+> dashboards, webhooks, marketing workflow, billing — belongs in
+> the platform repo.
 
 ## Architecture Decisions — Do Not Change These
 
@@ -112,26 +126,47 @@ Each audience gets a distinct system prompt. Prompt files live in /docs/prompts/
 - `ceo.md` — pure business language, 3 bullet points max, outcomes not features
 - `public.md` — customer-facing, positive framing, features only not fixes
 
-## Build Order — Follow This Exactly
+## Build Order
 
-### Phase 1 — Open Source Core (build this first)
-1. Domain models and interfaces in LogTunnel.Core
-2. ChangelogTranslatorService with Semantic Kernel
-3. Prompt templates for all four audiences
-4. Basic minimal API — POST /translate, POST /configure, GET /health
-5. CLI tool — logtunnel translate command
-6. Unit tests for translator
-7. README and documentation
+### Phase 1 — Open Source Core — COMPLETE
+1. ✅ Domain models and interfaces in LogTunnel.Core
+2. ✅ ChangelogTranslatorService with Semantic Kernel
+3. ✅ Prompt templates for all four audiences
+4. ✅ Basic minimal API — POST /translate, POST /configure, GET /health
+5. ✅ CLI tool — logtunnel translate command
+6. ✅ Unit tests for translator
+7. ✅ README and documentation
 
-### Phase 2 — Hosted Platform (only after Phase 1 ships)
-1. PostgreSQL schema and EF Core setup
-2. User accounts and JWT auth
-3. Project management (CRUD)
-4. GitHub webhook handler
-5. Company context memory with pgvector
-6. Public changelog page (React)
-7. Stripe integration
-8. Slack/email delivery
+### Phase 2 — Data Layer — COMPLETE in this repo
+1. ✅ PostgreSQL schema (entities, EF Core configurations, migrations)
+2. ✅ Repository interfaces in LogTunnel.Core/Domain/Interfaces
+3. ✅ Repository implementations in LogTunnel.Infrastructure
+4. ✅ Testcontainers integration tests in LogTunnel.Infrastructure.Tests
+
+### Phase 2 — Hosted Platform Code — moved to the platform repo
+The following items were built but no longer live in this repo. They
+ship from **github.com/logtunnelhq/platform**, which consumes this
+repo as a git submodule:
+
+- User accounts, JWT auth, refresh-token rotation
+- Role-based authorization policies
+- Admin endpoints (teams, projects, repositories, users)
+- Daily log endpoints under /me/*
+- Stand-up views (team / project / org)
+- Multi-host webhook handlers (GitHub, GitLab, Azure DevOps)
+- Translation worker background service
+- Hourly daily-log freeze job
+- Marketing public-translation workflow
+- Stand-up export endpoint (Slack/Teams/copy/email)
+- Public changelog endpoint
+- React 18 + TypeScript dashboard (login, 6 role pages, admin panel,
+  public changelog page)
+
+### Phase 3 — Stripe Billing — planned, in the platform repo
+Per-tenant subscription, webhook handler, quota enforcement,
+customer portal. The `subscriptions` table will land here in core
+(it's part of the data layer); the webhook handler + quota
+middleware land in the platform repo.
 
 ## What NOT To Build Yet
 
@@ -181,5 +216,14 @@ JWT__AUDIENCE=
 
 ## Current Status
 
-Phase 1 not yet started. Starting from scratch.
-First task: scaffold the solution structure and implement ChangelogTranslatorService.
+- **Phase 1 (translator engine, prompts, CLI, minimal API)** —
+  COMPLETE (59 commits in this repo).
+- **Phase 2 data layer (entities, repositories, EF Core migrations,
+  Testcontainers integration tests)** — COMPLETE in this repo.
+- **Phase 2 hosted-platform code + Phase 3 React frontend** —
+  COMPLETE in the **platform repo**:
+  **github.com/logtunnelhq/platform** (private, consumes this repo
+  as a git submodule).
+- **Phase 3 (Stripe billing)** — next, planned in the platform repo.
+  Schema additions for the `subscriptions` table will land here in
+  core when the work begins.
