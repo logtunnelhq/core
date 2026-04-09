@@ -20,10 +20,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- The integration test project pokes at internal repository
+    <!-- The integration test projects poke at internal repository
          classes directly to round-trip them against Testcontainers
-         Postgres without spinning up a full DI container. -->
+         Postgres without spinning up a full DI container.
+         LogTunnel.Platform.Tests lives in the separate platform
+         repo (https://github.com/logtunnelhq/platform) and consumes
+         this assembly as a git submodule; the friend declaration
+         here is the only trace of the platform repo and carries no
+         runtime dependency. -->
     <InternalsVisibleTo Include="LogTunnel.Infrastructure.Tests" />
+    <InternalsVisibleTo Include="LogTunnel.Platform.Tests" />
   </ItemGroup>
 
   <ItemGroup>
