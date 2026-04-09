@@ -24,6 +24,22 @@ namespace LogTunnel.Core.Domain.Interfaces;
 /// append-only <see cref="PublicTranslationEvent"/> trail. Models the
 /// marketing edit / approve / publish workflow.
 /// </summary>
+/// <summary>
+/// Result row for
+/// <see cref="IPublicTranslationRepository.ListPublishedByTenantAsync"/>.
+/// Carries the marketing-edited content (or the original LLM output
+/// when marketing left it untouched), the date range the translation
+/// covers, and the publish timestamp for ordering.
+/// </summary>
+public sealed record PublishedPublicTranslation(
+    Guid PublicTranslationId,
+    Guid TranslationId,
+    string Content,
+    DateOnly DateFrom,
+    DateOnly DateTo,
+    DateTimeOffset PublishedAt,
+    string? PublicSlug);
+
 public interface IPublicTranslationRepository
 {
     /// <summary>Fetch a public translation by tenant and primary key.</summary>
@@ -40,6 +56,16 @@ public interface IPublicTranslationRepository
     Task<Result<IReadOnlyList<PublicTranslation>>> ListByTenantAsync(
         Guid tenantId,
         string? workflowStatus,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// List every published public translation for a tenant alongside
+    /// the immutable original content from the underlying
+    /// <see cref="Translation"/>. Used by the unauthenticated public
+    /// changelog page; ordered by <c>published_at</c> descending.
+    /// </summary>
+    Task<Result<IReadOnlyList<PublishedPublicTranslation>>> ListPublishedByTenantAsync(
+        Guid tenantId,
         CancellationToken cancellationToken = default);
 
     /// <summary>

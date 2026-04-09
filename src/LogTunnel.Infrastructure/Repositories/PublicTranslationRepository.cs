@@ -52,6 +52,36 @@ internal sealed class PublicTranslationRepository : IPublicTranslationRepository
         return Result<IReadOnlyList<PublicTranslation>>.Success(rows);
     }
 
+    public async Task<Result<IReadOnlyList<PublishedPublicTranslation>>> ListPublishedByTenantAsync(
+        Guid tenantId, CancellationToken cancellationToken = default)
+    {
+        // Join public_translations -> translations so we can return
+        // the date range + immutable content next to the marketing
+        // edits in a single query. Coalesce edited_content over
+        // translations.content so an unedited published row still
+        // has something readable.
+        var rows = await _db.PublicTranslations
+            .Where(pt => pt.TenantId == tenantId && pt.WorkflowStatus == "published")
+            .Join(
+                _db.Translations,
+                pt => pt.TranslationId,
+                t => t.Id,
+                (pt, t) => new { pt, t })
+            .OrderByDescending(x => x.pt.PublishedAt)
+            .Select(x => new PublishedPublicTranslation(
+                x.pt.Id,
+                x.t.Id,
+                x.pt.EditedContent ?? x.t.Content,
+                x.t.DateFrom,
+                x.t.DateTo,
+                x.pt.PublishedAt!.Value,
+                x.pt.PublicSlug))
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        return Result<IReadOnlyList<PublishedPublicTranslation>>.Success(rows);
+    }
+
     public async Task<Result<PublicTranslation>> UpdateContentAsync(
         Guid publicTranslationId,
         string editedContent,
