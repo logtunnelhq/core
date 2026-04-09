@@ -62,4 +62,34 @@ public interface ITranslationRepository
         Guid translationId,
         string failureReason,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Create or reset a translation row for the supplied composite
+    /// key. If a row already exists and is <c>"ready"</c> or
+    /// <c>"failed"</c>, flips it back to <c>"pending"</c> so the
+    /// worker re-renders. If already <c>"pending"</c> or
+    /// <c>"rendering"</c>, leaves it alone (idempotent). Returns the
+    /// upserted row.
+    /// </summary>
+    Task<Result<Translation>> UpsertPendingAsync(
+        Guid tenantId,
+        string scopeKind,
+        Guid scopeId,
+        DateOnly dateFrom,
+        DateOnly dateTo,
+        string audience,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// List every translation for a scope + date range, across all
+    /// audiences. Returns up to 4 rows (one per audience) ordered by
+    /// audience name.
+    /// </summary>
+    Task<Result<IReadOnlyList<Translation>>> ListByScopeAsync(
+        Guid tenantId,
+        string scopeKind,
+        Guid scopeId,
+        DateOnly dateFrom,
+        DateOnly dateTo,
+        CancellationToken cancellationToken = default);
 }

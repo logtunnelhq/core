@@ -147,4 +147,93 @@ internal sealed class TranslationRepository : ITranslationRepository
             return Result<Translation>.Failure($"Failed to mark translation failed: {ex.GetBaseException().Message}");
         }
     }
+
+    public async Task<Result<Translation>> UpsertPendingAsync(
+        Guid tenantId,
+        string scopeKind,
+        Guid scopeId,
+        DateOnly dateFrom,
+        DateOnly dateTo,
+        string audience,
+        CancellationToken cancellationToken = default)
+    {
+        var existing = await _db.Translations
+            .FirstOrDefaultAsync(
+                t => t.TenantId == tenantId
+                  && t.ScopeKind == scopeKind
+                  && t.ScopeId == scopeId
+                  && t.DateFrom == dateFrom
+                  && t.DateTo == dateTo
+                  && t.Audience == audience,
+                cancellationToken)
+            .ConfigureAwait(false);
+
+        if (existing is not null)
+        {
+            // Already in flight — leave it alone.
+            if (existing.Status is "pending" or "rendering")
+                return Result<Translation>.Success(existing);
+
+            // Flip ready/failed back to pending for re-render.
+            existing.Status = "pending";
+            existing.Content = string.Empty;
+            existing.FailureReason = null;
+            existing.GeneratedAt = DateTimeOffset.UtcNow;
+
+            try
+            {
+                await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                return Result<Translation>.Success(existing);
+            }
+            catch (DbUpdateException ex)
+            {
+                return Result<Translation>.Failure($"Failed to reset translation to pending: {ex.GetBaseException().Message}");
+            }
+        }
+
+        var row = new Translation
+        {
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            ScopeKind = scopeKind,
+            ScopeId = scopeId,
+            DateFrom = dateFrom,
+            DateTo = dateTo,
+            Audience = audience,
+            Content = string.Empty,
+            InputsHash = Guid.NewGuid().ToString("N"),
+            Status = "pending",
+        };
+
+        try
+        {
+            _db.Translations.Add(row);
+            await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return Result<Translation>.Success(row);
+        }
+        catch (DbUpdateException ex)
+        {
+            return Result<Translation>.Failure($"Failed to insert pending translation: {ex.GetBaseException().Message}");
+        }
+    }
+
+    public async Task<Result<IReadOnlyList<Translation>>> ListByScopeAsync(
+        Guid tenantId,
+        string scopeKind,
+        Guid scopeId,
+        DateOnly dateFrom,
+        DateOnly dateTo,
+        CancellationToken cancellationToken = default)
+    {
+        var rows = await _db.Translations
+            .Where(t => t.TenantId == tenantId
+                     && t.ScopeKind == scopeKind
+                     && t.ScopeId == scopeId
+                     && t.DateFrom == dateFrom
+                     && t.DateTo == dateTo)
+            .OrderBy(t => t.Audience)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+        return Result<IReadOnlyList<Translation>>.Success(rows);
+    }
 }
