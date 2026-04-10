@@ -79,6 +79,33 @@ internal sealed class UserRepository : IUserRepository
             : Result<User>.Success(user);
     }
 
+    public async Task<Result<User>> UpdateAsync(User user, CancellationToken cancellationToken = default)
+    {
+        if (user is null) return Result<User>.Failure("User is required.");
+
+        var existing = await _db.Users
+            .FirstOrDefaultAsync(u => u.Id == user.Id, cancellationToken)
+            .ConfigureAwait(false);
+        if (existing is null)
+            return Result<User>.Failure($"User {user.Id} not found.");
+
+        existing.DisplayName = user.DisplayName;
+        existing.DashboardRole = user.DashboardRole;
+        existing.GitEmail = user.GitEmail;
+        existing.Status = user.Status;
+        existing.UpdatedAt = DateTimeOffset.UtcNow;
+
+        try
+        {
+            await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            return Result<User>.Success(existing);
+        }
+        catch (DbUpdateException ex)
+        {
+            return Result<User>.Failure($"Failed to update user: {ex.GetBaseException().Message}");
+        }
+    }
+
     public async Task<Result<IReadOnlyList<User>>> ListByTenantAsync(Guid tenantId, CancellationToken cancellationToken = default)
     {
         var rows = await _db.Users

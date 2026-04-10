@@ -56,6 +56,13 @@ public interface IUserRepository
     /// <summary>Insert a new user. Returns the persisted entity.</summary>
     Task<Result<User>> AddAsync(User user, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Update mutable fields on a user: display name, dashboard role,
+    /// git email, status. Does not update email or password — those
+    /// have their own dedicated flows.
+    /// </summary>
+    Task<Result<User>> UpdateAsync(User user, CancellationToken cancellationToken = default);
+
     /// <summary>Add a user to a team in the given role (<c>"member"</c> or <c>"lead"</c>).</summary>
     Task<Result<bool>> AddToTeamAsync(Guid teamId, Guid userId, string role, CancellationToken cancellationToken = default);
 
